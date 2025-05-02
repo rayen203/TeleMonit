@@ -1,0 +1,2 @@
+\App\Models\Utilisateur:create(['nom'=>'Rayen', 'prenom'=>'BSM', 'email'=>'rayenbsm03@gmail.com', 'password'=> bcrypt('password123'), 'statut'=>1]);
+\App\Models\Utilisateur::create(['nom'=>'Rayen', 'prenom'=>'BSM', 'email'=>'rayenbsm03@gmail.com', 'password'=> bcrypt('password123'), 'statut'=>1]);
