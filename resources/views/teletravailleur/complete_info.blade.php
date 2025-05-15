@@ -1,116 +1,92 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Compléter le Profil - TeleMonit</title>
-    <style>
-        body {
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-            font-family: Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            color: white;
-        }
-        .container {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 40px;
-            text-align: center;
-            width: 400px;
-            position: relative;
-        }
-        .avatar {
-            width: 100px;
-            height: 100px;
-            background: #4a90e2;
-            border-radius: 50%;
-            margin: 0 auto 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .avatar img {
-            width: 60%;
-            height: auto;
-        }
-        input {
-            width: 100%;
-            padding: 10px;
-            margin: 10px 0;
-            border: none;
-            border-radius: 25px;
-            background: rgba(255, 255, 255, 0.2);
-            color: white;
-            box-sizing: border-box;
-        }
-        input::placeholder {
-            color: rgba(255, 255, 255, 0.7);
-        }
-        button {
-            background: rgba(255, 255, 255, 0.3);
-            border: none;
-            padding: 10px 30px;
-            border-radius: 25px;
-            color: white;
-            cursor: pointer;
-            margin-top: 20px;
-            transition: background 0.3s;
-        }
-        button:hover {
-            background: rgba(255, 255, 255, 0.5);
-        }
-        .dots {
-            display: flex;
-            justify-content: center;
-            margin-top: 20px;
-        }
-        .dot {
-            width: 10px;
-            height: 10px;
-            background: rgba(255, 255, 255, 0.5);
-            border-radius: 50%;
-            margin: 0 5px;
-        }
-        .dot.active {
-            background: white;
-        }
-        .error {
-            color: red;
-            font-size: 14px;
-            text-align: left;
-            margin-top: 5px;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <div class="avatar">
-            <!-- Placeholder pour l'avatar, à remplacer par une image réelle si disponible -->
-        </div>
+@extends('layouts.base-interface')
+
+@section('content')
+    <div class="relative z-10 bg-white/10 backdrop-blur-lg border-2 border-gray-500 rounded-[100px] shadow-xl px-10 py-12 w-[894px] h-[708px] text-center transform scale-75">
+        <img src="{{ asset('images/avatar1.png') }}" alt="User Avatar" class="absolute w-[190px] h-[183px] rounded-full left-1/2 transform -translate-x-1/2 -top-[75px]">
+
+        <br>
+        <br>
+        <br><br><br>
+
+
+
+        @if (session('error'))
+            <div class="bg-red-100 text-red-700 px-4 py-2 rounded mb-4 font-poppins">
+                {{ session('error') }}
+            </div>
+        @endif
+
         <form method="POST" action="{{ route('teletravailleur.complete.store', $token) }}">
             @csrf
-            <input type="text" name="cin" placeholder="CIN:" required>
-            @error('cin')
-                <div class="error">{{ $message }}</div>
-            @enderror
-            <input type="text" name="telephone" placeholder="Phone number:" required>
-            @error('telephone')
-                <div class="error">{{ $message }}</div>
-            @enderror
-            <input type="text" name="adresse" placeholder="Address:" required>
-            @error('adresse')
-                <div class="error">{{ $message }}</div>
-            @enderror
-            <button type="submit">Next →</button>
+
+            <!-- CIN -->
+            <div class="mb-4 text-center">
+                <x-text-input
+                    style="border-radius: 57px;"
+                    id="cin"
+                    name="cin"
+                    type="text"
+                    value="{{ old('cin') }}"
+                    required
+                    placeholder="CIN:"
+                    class="w-[745px] h-[88px] px-4 rounded-[57px] bg-[#D9D9D9] opacity-100 text-gray-700 font-semibold font-poppins border-none focus:outline-none placeholder:text-xl"
+                />
+                @error('cin')
+                    <span class="mt-1 text-red-200 font-poppins text-sm block">{{ $message }}</span>
+                @enderror
+            </div>
+
+            <!-- Phone number -->
+            <div class="mb-4 text-center">
+                <x-text-input
+                    style="border-radius: 57px;"
+                    id="telephone"
+                    name="telephone"
+                    type="text"
+                    value="{{ old('telephone') }}"
+                    required
+                    placeholder="Phone number:"
+                    class="w-[745px] h-[88px] px-4 rounded-[57px] bg-[#D9D9D9] opacity-100 text-gray-700 font-semibold font-poppins border-none focus:outline-none placeholder:text-xl"
+                />
+                @error('telephone')
+                    <span class="mt-1 text-red-200 font-poppins text-sm block">{{ $message }}</span>
+                @enderror
+            </div>
+
+            <!-- Address -->
+            <div class="mb-4 text-center">
+                <x-text-input
+                    style="border-radius: 57px;"
+                    id="adresse"
+                    name="adresse"
+                    type="text"
+                    value="{{ old('adresse') }}"
+                    required
+                    placeholder="Address:"
+                    class="w-[745px] h-[88px] px-4 rounded-[57px] bg-[#D9D9D9] opacity-100 text-gray-700 font-semibold font-poppins border-none focus:outline-none placeholder:text-xl"
+                />
+                @error('adresse')
+                    <span class="mt-1 text-red-200 font-poppins text-sm block">{{ $message }}</span>
+                @enderror
+            </div>
+
+            <br>
+            <!-- Bouton Next -->
+            <div class="flex justify-center mt-4">
+                <button
+                    type="submit"
+                    class="h-[78px] w-[245px] rounded-[57px] bg-[#D9D9D9] opacity-100 text-black font-black text-[24px] font-inter hover:bg-[#319FBB] transition duration-200"
+                >
+                    Next →
+                </button>
+            </div>
         </form>
-        <div class="dots">
-            <div class="dot"></div>
-            <div class="dot active"></div>
-            <div class="dot"></div>
+        <br><br><br><br><br>
+        <!-- 3 points sous la carte -->
+        <div class="flex justify-center mt-6 space-x-2">
+            <div class="w-4 h-4 bg-[#D9D9D9] rounded-full opacity-50"></div>
+            <div class="w-4 h-4 bg-[#D9D9D9] rounded-full "></div>
+            <div class="w-4 h-4 bg-[#D9D9D9] rounded-full opacity-50"></div>
         </div>
     </div>
-</body>
-</html>
+@endsection

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Welcome to TeleMonit</title>
+    <title>@yield('title')</title>
     <style>
         body {
             font-family: 'Poppins', sans-serif;
@@ -67,11 +67,6 @@
             font-weight: bold;
             margin: 20px 0;
         }
-        .footer {
-            margin-top: 20px;
-            font-size: 12px;
-            color: #4A5568;
-        }
         .external-footer {
             margin-top: 20px;
             font-size: 12px;
@@ -80,24 +75,12 @@
         }
     </style>
 </head>
-<body style="background-color: #a0b6bc;">
+<body>
     <div class="email-wrapper">
         <img src="cid:logo2.png" alt="TeleMonit Logo" class="logo">
         <div class="logo-container">
-            <!-- Main content -->
             <div class="content">
-                <h2>Hello {{ $user->nom }} {{ $user->prenom }}</h2>
-                <p>Welcome to TeleMonit! We are delighted to welcome you to our remote work team.</p>
-                <p>Here are your login credentials to access your account:</p>
-                <div class="credentials">
-                    <p><strong>Email:</strong> <a href="mailto:{{ $user->email }}">{{ $user->email }}</a></p>
-                    <p><strong>Temporary password:</strong> {{ $password }}</p>
-                </div>
-                <p>Please complete your profile by clicking the button below or by visiting this link directly:</p>
-                <a href="{{ $completionLink }}" class="button">Complete my profile</a>
-                <p>After completing your profile, you will be able to access your dashboard and start using our monitoring tools.</p>
-                <p>If you have any questions, please do not hesitate to contact our support team.</p>
-                <p>Best regards,<br>TELEMONIT</p>
+                @yield('content')
             </div>
         </div>
         <div class="external-footer">

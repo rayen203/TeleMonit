@@ -15,6 +15,7 @@ use App\Models\Administrateur;
 use App\Models\Calendar;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Cache;
+use App\Notifications\CustomResetPasswordNotification;
 
 class Utilisateur extends Authenticatable implements CanResetPassword // MustVerifyEmail
 {
@@ -58,10 +59,7 @@ class Utilisateur extends Authenticatable implements CanResetPassword // MustVer
         return $this->hasMany(Calendar::class, 'user_id');
     }
 
-    public function getAuthIdentifierName()
-    {
-        return 'email'; // Assure-toi que c’est bien 'email'
-    }
+
 
     public function getAuthPassword()
     {
@@ -89,5 +87,25 @@ class Utilisateur extends Authenticatable implements CanResetPassword // MustVer
             $this->utilisateur->save();
         }
     }
+
+    public function sendPasswordResetNotification($token)
+    {
+        $this->notify(new CustomResetPasswordNotification($token));
+    }
+
+
+
+
+
+    public function getAuthIdentifierName()
+    {
+        return 'email';
+    }
+
+    public function getAuthIdentifier()
+    {
+        return $this->email;
+    }
+
 
 }

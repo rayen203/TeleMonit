@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\NewPasswordController;
+use App\Http\Controllers\Auth\UpdatePasswordController;
 
 // Redirection racine vers login
 Route::redirect('/', '/login')->name('root');
@@ -27,6 +28,10 @@ Route::middleware('auth')->group(function () {
     Route::put('/calendars/{date}/tasks/{tacheId}', [CalendarController::class, 'updateTask'])->name('calendars.tasks.update');
 
     Route::delete('/calendars/{date}', [CalendarController::class, 'destroy'])->name('calendars.destroy');
+
+    // Dans le groupe middleware('auth')
+Route::get('password/update', [UpdatePasswordController::class, 'show'])->name('password.update');
+Route::post('password/update', [UpdatePasswordController::class, 'update'])->name('password.update');
 });
 
 // Routes Admin
@@ -80,7 +85,7 @@ Route::post('reset-password', [NewPasswordController::class, 'store'])->name('pa
 
 
 // routes/web.php
-Route::get('/phpinfo', function () {
+/*Route::get('/phpinfo', function () {
     phpinfo();
 });
 
@@ -89,4 +94,4 @@ Route::get('/phpinfo', function () {
 Route::get('/test-session', function () {
     session(['test' => 'Session is working']);
     return session('test');
-});
+});*/

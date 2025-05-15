@@ -8,41 +8,42 @@
         <br>
         <br><br><br>
 
-
-
-        @if ($errors->any())
-            <div class="bg-red-100 text-red-700 px-4 py-2 rounded mb-4 font-poppins">
-                <ul>
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
+        @if (session('status'))
+            <div class="bg-green-100 text-green-800 px-4 py-2 rounded mb-4 font-poppins">
+                {{ session('status') }}
             </div>
         @endif
 
-        <form method="POST" action="{{ route('teletravailleur.change.password', $token) }}">
-            @csrf
+        @if ($errors->has('password') || $errors->has('new_password') || $errors->has('confirm_password'))
+            <div class="bg-red-100 text-red-700 px-4 py-2 rounded mb-4 font-poppins">
+                @if ($errors->has('password'))
+                    {{ $errors->first('password') }}
+                @elseif ($errors->has('new_password'))
+                    {{ $errors->first('new_password') }}
+                @elseif ($errors->has('confirm_password'))
+                    {{ $errors->first('confirm_password') }}
+                @endif
+            </div>
+        @endif
 
-             <!-- Faux champ invisible pour tromper l'autocomplétion -->
-             <input type="password" style="display: none;" autocomplete="off">
+        <form method="POST" action="{{ route('password.update') }}">
+            @csrf
 
             <!-- Old Password -->
             <div class="mb-4 text-center">
                 <x-text-input
                     style="border-radius: 57px;"
-                    id="old_password"
-                    name="old_password"
+                    id="password"
+                    name="password"
                     type="password"
                     required
-                    autocomplete="new-password"
+                    autocomplete="current-password"
                     placeholder="Old password:"
                     class="w-[745px] h-[88px] px-4 rounded-[57px] bg-[#D9D9D9] opacity-100 text-gray-700 font-semibold font-poppins border-none focus:outline-none placeholder:text-xl"
                 />
-                @error('old_password')
-                    <span class="mt-1 text-red-200 font-poppins text-sm block">{{ $message }}</span>
-                @enderror
+                <x-input-error :messages="$errors->get('password')" class="mt-1 text-red-200 font-poppins text-sm" />
             </div>
-
+            <br>
             <!-- New Password -->
             <div class="mb-4 text-center">
                 <x-text-input
@@ -51,14 +52,13 @@
                     name="new_password"
                     type="password"
                     required
+                    autocomplete="new-password"
                     placeholder="New password:"
                     class="w-[745px] h-[88px] px-4 rounded-[57px] bg-[#D9D9D9] opacity-100 text-gray-700 font-semibold font-poppins border-none focus:outline-none placeholder:text-xl"
                 />
-                @error('new_password')
-                    <span class="mt-1 text-red-200 font-poppins text-sm block">{{ $message }}</span>
-                @enderror
+                <x-input-error :messages="$errors->get('new_password')" class="mt-1 text-red-200 font-poppins text-sm" />
             </div>
-
+            <br>
             <!-- Confirm Password -->
             <div class="mb-4 text-center">
                 <x-text-input
@@ -67,40 +67,37 @@
                     name="new_password_confirmation"
                     type="password"
                     required
+                    autocomplete="new-password"
                     placeholder="Confirm password:"
                     class="w-[745px] h-[88px] px-4 rounded-[57px] bg-[#D9D9D9] opacity-100 text-gray-700 font-semibold font-poppins border-none focus:outline-none placeholder:text-xl"
                 />
+                <x-input-error :messages="$errors->get('new_password_confirmation')" class="mt-1 text-red-200 font-poppins text-sm" />
             </div>
 
             <br>
-            <!-- Bouton Next -->
-            <div class="flex justify-center mt-4">
+            <!-- Boutons Back et Confirm -->
+            <div class="flex justify-center mt-4 space-x-4">
+                <!-- Bouton Back -->
+                <a
+                    href="{{ auth()->user()->teletravailleur ? route('teletravailleur.dashboard') : route('admin.dashboard') }}"
+                    class="h-[78px] w-[245px] rounded-[57px] bg-[#D9D9D9] opacity-100 text-black font-black text-[24px] font-inter hover:bg-[#319FBB] transition duration-200 flex items-center justify-center"
+                >
+                    Back
+                </a>
+                <!-- Bouton Confirm -->
                 <button
                     type="submit"
                     class="h-[78px] w-[245px] rounded-[57px] bg-[#D9D9D9] opacity-100 text-black font-black text-[24px] font-inter hover:bg-[#319FBB] transition duration-200"
                 >
-                    Next →
+                    Confirm
                 </button>
             </div>
         </form>
-        <br><br><br><br><br>
-        <!-- 3 points sous la carte -->
-        <div class="flex justify-center mt-6 space-x-2">
-            <div class="w-4 h-4 bg-[#D9D9D9] rounded-full"></div>
-            <div class="w-4 h-4 bg-[#D9D9D9] rounded-full opacity-50"></div>
-            <div class="w-4 h-4 bg-[#D9D9D9] rounded-full opacity-50"></div>
-        </div>
+
+
     </div>
 
-     <!-- Script JavaScript pour vider le champ au chargement -->
-     <script>
-        window.onload = function() {
-            const oldPasswordField = document.getElementById('old_password');
-            if (oldPasswordField) {
-                oldPasswordField.value = '';
-            }
-        };
-    </script>
+
 
 
 @endsection

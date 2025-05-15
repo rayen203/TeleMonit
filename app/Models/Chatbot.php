@@ -31,13 +31,13 @@ class Chatbot extends Model
     {
         // Liste statique des FAQs (peut être remplacée par une table faqs)
         $faqs = [
-            ['question' => 'combien de jours de congé ai-je par an ?', 'answer' => 'Vous avez droit à 30 jours de congé par an.'],
-            ['question' => 'comment demander un congé ?', 'answer' => 'Vous pouvez demander un congé via le portail RH en ligne.'],
-            ['question' => 'qui contacter pour des questions rh ?', 'answer' => 'Veuillez contacter le département RH à rh@societe.com.'],
+            ['question' => 'How many vacation days do I have per year?', 'answer' => 'You are entitled to 30 vacation days per year.'],
+            ['question' => 'How do I request a leave?', 'answer' => 'You can request a vacation through the online HR portal.'],
+            ['question' => 'Who should I contact for HR-related questions?', 'answer' => 'Please contact the HR department at hr@societe.com.'],
         ];
 
         $question = strtolower(trim($question));
-        $answer = 'Désolé, je n’ai pas de réponse à cette question. Veuillez contacter le support pour plus d’informations.';
+        $answer = 'Sorry, I don’t have an answer to that question. Please contact support for more information.';
 
         // Recherche de correspondance dans les FAQs
         foreach ($faqs as $faq) {

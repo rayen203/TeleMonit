@@ -1,114 +1,102 @@
-<x-guest-layout>
-    <div style="display: flex; flex-direction: column; min-height: 100vh; background: linear-gradient(180deg, #000943 0%, #1E3A8A 100%);">
-        <!-- Header with Logo and Dark Mode Toggle -->
-        <div style="display: flex; justify-content: space-between; align-items: center; padding: 20px 40px;">
-            <div style="display: flex; align-items: center;">
-                <img src="{{ asset('images/telemonit-logo.png') }}" alt="Telemonit Logo" style="height: 24px;" />
+@extends('layouts.base-interface')
+
+@section('content')
+    <div class="relative z-10 bg-white/10 backdrop-blur-lg border-2 border-gray-500 rounded-[100px] shadow-xl px-10 py-12 w-[894px] h-[708px] text-center transform scale-75">
+        <h1 class="text-[#E3EDEF] text-4xl sm:text-5xl font-semibold mb-16 leading-tight tracking-wide font-poppins">
+            UPGRADE YOUR<br>PRODUCTIVITY?
+        </h1>
+
+        <br>
+        <br>
+        <x-auth-session-status class="mb-4 text-[#E3EDEF] font-poppins" :status="session('status')" />
+
+        @if (session('success'))
+            <div class="bg-green-100 text-green-800 px-4 py-2 rounded mb-4 font-poppins">
+                {{ session('success') }}
             </div>
-            <div>
-                <label style="display: flex; align-items: center; position: relative;">
-                    <span style="color: #FFFFFF; margin-right: 10px;">🌙</span>
-                    <input type="checkbox" style="appearance: none; width: 40px; height: 20px; background: #D9D9D9; border-radius: 20px; position: relative; cursor: pointer;" />
-                    <span style="position: absolute; width: 16px; height: 16px; background: #FFFFFF; border-radius: 50%; top: 2px; left: 2px; transition: left 0.3s;"></span>
-                </label>
+        @endif
+
+        @if ($errors->has('error'))
+            <div class="bg-red-100 text-red-700 px-4 py-2 rounded mb-4 font-poppins">
+                {{ $errors->first('error') }}
             </div>
-        </div>
+        @endif
 
-        <!-- Main Content (Card) -->
-        <div style="flex: 1; display: flex; justify-content: center; align-items: center;">
-            <div style="position: relative; background: rgba(217, 217, 217, 0.15); border-radius: 40px; padding: 40px; width: 400px; text-align: center; box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1); backdrop-filter: blur(8.7px); border: 2px solid #666666;">
-                <!-- Clock Background (Using Image) -->
-                <img src="{{ asset('images/clock.png') }}" alt="Clock Background" style="position: absolute; top: -50px; right: -100px; width: 500px; height: 500px; opacity: 0.8;" />
+        <form method="POST" action="{{ route('login') }}">
+            @csrf
 
-                <!-- Heading -->
-                <h1 style="color: #E3EDEF; font-size: 40px; font-weight: 600; margin-bottom: 40px; line-height: 1.2; letter-spacing: 4px; font-family: 'Poppins', sans-serif; text-align: center;">
-                    UPGRADE YOUR<br>PRODUCTIVITY?
-                </h1>
+            <!-- Email -->
+            <div class="mb-4 text-center">
+                <x-text-input
+                    style="border-radius: 57px"
+                    id="email"
+                    name="email"
+                    type="email"
+                    :value="old('email') ?? session('email')"
+                    required
+                    autofocus
+                    autocomplete="username"
+                    placeholder="Email:"
+                    class="w-[745px] h-[88px] px-4 rounded-[57px] bg-[#D9D9D9] opacity-100 text-gray-700 font-semibold font-poppins border-none focus:outline-none placeholder:text-xl "
+                />
+                <x-input-error :messages="$errors->get('email')" class="mt-1 text-red-200 font-poppins text-sm" />
+            </div>
 
-                <!-- Session Status -->
-                <x-auth-session-status style="margin-bottom: 16px; color: #E3EDEF; font-family: 'Poppins', sans-serif;" :status="session('status')" />
+            <br>
 
-                @if (session('success'))
-                    <div style="padding: 10px; background: #d4edda; color: #155724; border-radius: 5px; margin-bottom: 20px; font-family: 'Poppins', sans-serif;">
-                        {{ session('success') }}
-                    </div>
-                @endif
+            <!-- Password -->
+            <div class="mb-4 text-center">
+                <x-text-input
+                    style="border-radius: 57px"
+                    id="password"
+                    name="password"
+                    type="password"
+                    required
+                    autocomplete="current-password"
+                    placeholder="Password:"
 
-                @if ($errors->has('error'))
-                    <div style="padding: 10px; background: #f8d7da; color: #721c24; border-radius: 5px; margin-bottom: 20px; font-family: 'Poppins', sans-serif;">
-                        {{ $errors->first('error') }}
-                    </div>
-                @endif
+                    class="w-[745px] h-[88px] px-4 rounded-[57px] bg-[#D9D9D9] opacity-100 text-gray-700 font-semibold font-poppins border-none focus:outline-none placeholder:text-xl"
+                />
+                <x-input-error :messages="$errors->get('password')" class="mt-1 text-red-200 font-poppins text-sm" />
+            </div>
 
-                <!-- Form -->
-                <form method="POST" action="{{ route('login') }}">
-                    @csrf
+            <br>
 
-                    <!-- Email Address -->
-                    <div style="width: 300px; margin: 0 auto;">
-                        <label for="email" style="display: block; color: #E3EDEF; font-size: 16px; font-family: 'Poppins', sans-serif; font-weight: 600; text-align: left; margin-bottom: 8px; line-height: 24px; letter-spacing: 0px;">Email:</label>
-                        <x-text-input
-                            id="email"
-                            name="email"
-                            type="email"
-                            :value="old('email') ?? session('email')"
-                            required
-                            autofocus
-                            autocomplete="username"
-                            placeholder="Email:"
-                            style="width: 100%; height: 50px; background: #D9D9D9; border-radius: 57px; border: none; padding: 15px 20px; font-size: 16px; color: #7D7D7D; font-weight: 600; font-family: 'Poppins', sans-serif;"
-                        />
-                        <x-input-error :messages="$errors->get('email')" style="margin-top: 8px; color: #f8d7da; font-family: 'Poppins', sans-serif;" />
-                    </div>
+            <div class="flex flex-col mb-4 w-[745px] mx-auto">
+                <!-- Remember Me -->
+                <div class="flex items-center mb-4 text-left">
+                    <input
+                        id="remember_me"
+                        type="checkbox"
+                        name="remember"
+                        class="w-6 h-6 rounded border border-gray-300 accent-indigo-600"
+                    />
+                    <label for="remember_me" class="ml-2 text-[#E3EDEF] text-base font-semibold font-poppins">
+                        {{ __('Remember me') }}
+                    </label>
+                </div>
 
-                    <!-- Password -->
-                    <div style="width: 300px; margin: 16px auto 0;">
-                        <label for="password" style="display: block; color: #E3EDEF; font-size: 16px; font-family: 'Poppins', sans-serif; font-weight: 600; text-align: left; margin-bottom: 8px; line-height: 24px; letter-spacing: 0px;">Password:</label>
-                        <x-text-input
-                            id="password"
-                            name="password"
-                            type="password"
-                            required
-                            autocomplete="current-password"
-                            placeholder="Password:"
-                            style="width: 100%; height: 50px; background: #D9D9D9; border-radius: 57px; border: none; padding: 15px 20px; font-size: 16px; color: #7D7D7D; font-weight: 600; font-family: 'Poppins', sans-serif;"
-                        />
-                        <x-input-error :messages="$errors->get('password')" style="margin-top: 8px; color: #f8d7da; font-family: 'Poppins', sans-serif;" />
-                    </div>
+                <br>
 
-                    <!-- Remember Me -->
-                    <div style="text-align: left; margin-top: 12px;">
-                        <label for="remember_me" style="display: inline-flex; align-items: center;">
-                            <input
-                                id="remember_me"
-                                type="checkbox"
-                                name="remember"
-                                style="width: 16px; height: 16px; border-radius: 4px; border: 1px solid #D1D5DB; accent-color: #4F46E5;"
-                            >
-                            <span style="margin-left: 8px; font-size: 14px; color: #E3EDEF; font-family: 'Poppins', sans-serif; font-weight: 600;">{{ __('Remember me') }}</span>
-                        </label>
-                    </div>
-
-                    <!-- Forgot Password and Log In Button -->
-                    <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 12px;">
-                        @if (Route::has('password.request'))
-                            <a
-                                href="{{ route('password.request') }}"
-                                style="text-decoration: underline; font-size: 14px; color: #E3EDEF; font-family: 'Poppins', sans-serif; font-weight: 600; text-align: right;"
-                            >
-                                {{ __('Forgot your password?') }}
-                            </a>
-                        @endif
-
-                        <button
-                            type="submit"
-                            style="width: 150px; height: 50px; background: #D9E0E0; border-radius: 57px; border: none; font-size: 16px; font-weight: 600; color: #000943; font-family: 'Poppins', sans-serif;"
+                <!-- Actions -->
+                <div class="flex justify-between items-center mt-4">
+                    @if (Route::has('password.request'))
+                        <a
+                            href="{{ route('password.request') }}"
+                            class="text-base underline text-[#E3EDEF] font-semibold font-poppins"
                         >
-                            LOG IN
-                        </button>
-                    </div>
-                </form>
+                            {{ __('Forgot your password?') }}
+                        </a>
+                    @endif
+
+                    <button
+                        type="submit"
+                        class="h-[78px] w-[245px] rounded-[57px] bg-[#D9D9D9] opacity-100 text-black font-black text-[24px] font-inter hover:bg-[#319FBB] transition duration-200"
+                    >
+                        LOG IN
+                    </button>
+                </div>
             </div>
-        </div>
+        </form>
     </div>
-</x-guest-layout>
+@endsection

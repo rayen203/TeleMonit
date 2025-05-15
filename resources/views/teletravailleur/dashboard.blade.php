@@ -1,413 +1,323 @@
-@extends('layouts.app')
+@extends('layouts.base-interface')
 
 @section('content')
-<div class="container">
-    <h2>Tableau de bord du Télétravailleur</h2>
-
-    <!-- Bouton "3 points" pour accéder au chatbot -->
-    <a href="{{ route('teletravailleur.chat.index') }}" class="btn btn-link" style="font-size: 24px; color: #007bff;">
-        <i class="fas fa-ellipsis-v"></i> Accéder au Chatbot
-    </a>
-
-    @if(session('status'))
-        <div class="alert alert-success">{{ session('status') }}</div>
-    @endif
-
-    @if(session('error'))
-        <div class="alert alert-danger">{{ session('error') }}</div>
-    @endif
-
-    <!-- Notification pour les seuils de 4h et 8h -->
-    @if($notification)
-        <div class="alert alert-info" role="alert">
-            {{ $notification }}
-        </div>
-    @endif
-
-    <!-- Notification de capture d'écran -->
-    <div id="captureNotification" class="alert alert-success" style="display: none; position: fixed; bottom: 20px; right: 20px; z-index: 1000;">
-        Capture enregistrée avec succès !
-    </div>
-
-    <!-- Informations Télétravailleur -->
-    <div class="card mb-4">
-        <div class="card-header">Informations du Télétravailleur</div>
-        <div class="card-body">
-            <p><strong>Nom :</strong> {{ $user->nom ?? 'Non défini' }}</p>
-            <p><strong>Prénom :</strong> {{ $user->prenom ?? 'Non défini' }}</p>
-            <p><strong>Email :</strong> {{ $user->email ?? 'Non défini' }}</p>
-            <p><strong>Statut :</strong> {{ $user->isOnline() ? '🟢 Actif' : '🔴 Inactif' }}</p>
-            <a href="{{ route('profile.edit') }}" class="btn btn-primary mt-3">Modifier le Profil</a>
-            <a href="{{ url('/calendars') }}" class="btn btn-info mt-3">Voir le Calendrier</a>
-            <form method="POST" action="{{ route('logout') }}" class="mt-3 d-inline-block">
-                @csrf
-                <button type="submit" class="btn btn-danger">Déconnexion</button>
-            </form>
-        </div>
-    </div>
-
-    <!-- Section pour le suivi des heures -->
-    <div class="card mb-4">
-        <div class="card-header">Suivi des Heures</div>
-        <div class="card-body">
-            <h5>Total Aujourd'hui : {{ $todayFormatted }}</h5>
-            <p>Temps de la session en cours : <span id="session-time">0h 0m 0s</span></p>
-            <div id="timer" class="mb-3">Temps de la session en cours : 0h 0m 0s</div>
-            <button id="startBtn" class="btn btn-success me-2">Démarrer</button>
-            <button id="pauseBtn" class="btn btn-warning me-2" disabled>Mettre en Pause</button>
-            <button id="resumeBtn" class="btn btn-info me-2" disabled>Reprendre</button>
-            <button id="stopBtn" class="btn btn-danger me-2" disabled>Arrêter</button>
-        </div>
-    </div>
-
-    <!-- Historique des heures -->
-    <div class="card">
-        <div class="card-header">Historique des Heures</div>
-        <div class="card-body">
-            @if($workingHours->isEmpty())
-                <p>Aucune heure enregistrée.</p>
-            @else
-                <table class="table table-bordered">
-                    <thead>
-                        <tr>
-                            <th>Date</th>
-                            <th>Début</th>
-                            <th>Fin</th>
-                            <th>Temps Total</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach($workingHours as $hour)
-                            <tr>
-                                <td>{{ $hour->date ? $hour->date->format('d/m/Y') : 'Non définie' }}</td>
-                                <td>{{ $hour->start_time ? $hour->start_time->format('H:i:s') : 'Non défini' }}</td>
-                                <td>{{ $hour->stop_time ? $hour->stop_time->format('H:i:s') : 'Non défini' }}</td>
-                                <td>{{ $hour->formatted_time }}</td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-                <h5>Total Mensuel : {{ $monthlyFormatted }}</h5>
-                {{ $workingHours->links() }}
-            @endif
-        </div>
-    </div>
-
-    <!-- Historique des Captures -->
-    <div class="card">
-        <div class="card-header">Historique des Captures d'Écran</div>
-        <div class="card-body">
-            @if($screenshots->isEmpty())
-                <p>Aucune capture d’écran enregistrée.</p>
-            @else
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th>Date</th>
-                            <th>Image</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach($screenshots as $screenshot)
-                            <tr>
-                                <td>{{ $screenshot->created_at->format('d/m/Y H:i:s') }}</td>
-                                <td><img src="{{ asset('storage/' . $screenshot->image_path) }}" alt="Capture" width="100"></td>
-                                <td><a href="{{ asset('storage/' . $screenshot->image_path) }}" target="_blank" class="btn btn-primary btn-sm">Voir en Plein Écran</a></td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-                {{ $screenshots->links() }}
-            @endif
-        </div>
-    </div>
-
-    <!-- Section Statistiques Mensuelles -->
-    <div class="card mb-4">
-        <div class="card-header">Statistiques Mensuelles</div>
-        <div class="card-body">
-            <!-- Sélecteur de mois -->
-            <form method="GET" action="{{ route('teletravailleur.dashboard') }}" class="mb-3">
-                <div class="form-group">
-                    <label for="month">Sélectionner un mois :</label>
-                    <input type="month" id="month" name="month" value="{{ request()->input('month', now()->setTimezone('UTC')->format('Y-m')) }}" class="form-control d-inline-block w-auto">
-                    <input type="hidden" name="t" value="{{ now()->timestamp }}"> <!-- Prévenir les problèmes de cache -->
-                    <button type="submit" class="btn btn-primary">Afficher</button>
+<!-- Conteneur principal pour gérer le positionnement -->
+<div style="position: relative; width: 100%; min-height: 100vh; overflow: visible;  padding: -10px; ">
+    <!-- Section admin ancrée à gauche -->
+    <div style="position: absolute; left: -210px; top: 60px; z-index: 10;">
+        <div class="p-3" style="background: rgba(0, 0, 0, 0.5); border-radius: 77px; width: 574px; height: 220px; position: relative; border: 0.5px solid rgb(113, 113, 113); backdrop-filter: blur(10px);">
+            <div class="d-flex align-items-center mb-2">
+                <div style="position: relative;">
+                    <img src="{{ Auth::user()->teletravailleur && Auth::user()->teletravailleur->photoProfil ? (Str::startsWith(Auth::user()->teletravailleur->photoProfil, 'images/') ? asset(Auth::user()->teletravailleur->photoProfil) : asset('storage/' . Auth::user()->teletravailleur->photoProfil)) : asset('images/default-profile.png') }}" alt="Admin Photo" class="rounded-circle me-3" style="width: 127px; height: 122px; margin-left: 190px; border-radius: 77px;" onerror="this.src='{{ asset('images/default-profile.png') }}';">
+                    <a href="{{ route('profile.edit') }}" style="position: absolute; margin-top: -120px; margin-left: 290px;">
+                        <img src="{{ asset('images/edit.png') }}" alt="Edit Icon" style="width: 29px; height: 29px;">
+                    </a>
                 </div>
-            </form>
+                <h5 class="mb-0" style="color: #E1E4E6; margin-left: 350px; margin-top: -70px; font-weight: bold; font-size: 23px;">{{ Auth::user()->nom ?? 'Admin' }} {{ Auth::user()->prenom ?? '' }}</h5>
+                <div>
+                    <p class="mb-0" style="color: #FFFFFF; width: 180px; height: 19px; margin-left: 195px; margin-top: 60px; text-decoration: underline; font-weight: bold;">{{ Auth::user()->email ?? 'mail@gmail.com' }}</p>
+                    <p class="mb-0" style="color: #FFFFFF; width: 180px; height: 19px; margin-left: 425px; margin-top: -17px; font-weight: bold;">+216 {{ $teletravailleur->telephone ?? 'N/A' }}</p>
 
-            @php
-            \Log::info('Utilisateur Connecté', ['user_id' => $user->id]);
-
-            // Utiliser user_id pour les requêtes sur Calendar
-            $userId = $user->id;
-            \Log::info('User ID Utilisé pour les Calendriers', ['user_id' => $userId]);
-
-            // Utiliser teletravailleur_id pour les autres requêtes (WorkingHour, Screenshot)
-            $teletravailleurId = $teletravailleur->id;
-            \Log::info('Teletravailleur ID Utilisé pour WorkingHour et Screenshot', ['teletravailleur_id' => $teletravailleurId]);
-
-            // Déterminer le mois à afficher (par défaut : mois actuel)
-            $selectedMonth = request()->input('month', now()->setTimezone('UTC')->format('Y-m'));
-            \Log::info('Mois sélectionné brut', ['selectedMonth' => $selectedMonth]);
-
-            // Créer la date et forcer une plage correcte
-            $selectedDate = \Carbon\Carbon::createFromFormat('Y-m', $selectedMonth, 'UTC')->startOfMonth();
-            $startOfMonth = $selectedDate->copy()->startOfDay();
-            $endOfMonth = $selectedDate->copy()->endOfMonth()->endOfDay();
-
-            \Log::info('Plage de dates pour le mois', [
-                'selectedMonth' => $selectedMonth,
-                'startOfMonth' => $startOfMonth->toDateTimeString(),
-                'endOfMonth' => $endOfMonth->toDateTimeString()
-            ]);
-
-            // Charger toutes les sessions du mois sélectionné
-            $monthlySessions = \App\Models\WorkingHour::where('teletravailleur_id', $teletravailleurId)
-                ->whereBetween('date', [$startOfMonth, $endOfMonth])
-                ->whereNotNull('stop_time')
-                ->get();
-
-            $monthlySeconds = 0;
-            foreach ($monthlySessions as $session) {
-                $effectiveSeconds = $session->total_seconds - ($session->pause_total_seconds ?? 0);
-                $monthlySeconds += max(0, $effectiveSeconds);
-            }
-            $totalHours = round($monthlySeconds / 3600, 2);
-
-            // Captures d'écran pour le mois sélectionné
-            $allScreenshots = \App\Models\Screenshot::where('teletravailleur_id', $teletravailleurId)
-                ->orderBy('created_at', 'desc')
-                ->get();
-            \Log::info('Toutes les Captures d’Écran (Vue)', ['screenshots' => $allScreenshots->toArray()]);
-
-            $monthlyScreenshots = $allScreenshots->filter(function($screenshot) use ($startOfMonth, $endOfMonth) {
-                $isBetween = $screenshot->created_at->between($startOfMonth, $endOfMonth);
-                \Log::info('Screenshot Date', [
-                    'id' => $screenshot->id,
-                    'created_at' => $screenshot->created_at->toDateTimeString(),
-                    'isBetween' => $isBetween
-                ]);
-                return $isBetween;
-            })->count();
-
-            // Tâches pour le mois sélectionné
-            $totalTasks = 0;
-            $calendars = \App\Models\Calendar::where('user_id', $userId)->get();
-            \Log::info('Tous les Calendriers (Vue)', ['calendars' => $calendars->toArray()]);
-
-            foreach ($calendars as $calendar) {
-                if (!empty($calendar->tacheList)) {
-                    $tasks = is_array($calendar->tacheList) ? $calendar->tacheList : [];
-                    \Log::info('Structure de tacheList', [
-                        'calendar_id' => $calendar->id,
-                        'tacheList' => $calendar->tacheList
-                    ]);
-
-                    if (is_array($tasks)) {
-                        foreach ($tasks as $task) {
-                            $taskDateKey = isset($task['deadline']) ? 'deadline' : null;
-                            $taskDate = null;
-                            if ($taskDateKey) {
-                                try {
-                                    $taskDate = \Carbon\Carbon::createFromFormat('Y-m-d\TH:i', $task[$taskDateKey], 'UTC');
-                                    if ($taskDate === false) {
-                                        $taskDate = \Carbon\Carbon::parse($task[$taskDateKey])->setTimezone('UTC');
-                                    }
-                                } catch (\Exception $e) {
-                                    \Log::error('Erreur lors du parsing de la date de fin de la tâche', [
-                                        'calendar_id' => $calendar->id,
-                                        'task' => $task,
-                                        'error' => $e->getMessage()
-                                    ]);
-                                }
-                            }
-
-                            $isTaskDateBetween = $taskDate && $taskDate->between($startOfMonth, $endOfMonth);
-                            if ($isTaskDateBetween) {
-                                $totalTasks += 1;
-                                \Log::info('Tâche ajoutée via tacheList deadline', [
-                                    'calendar_id' => $calendar->id,
-                                    'task_title' => $task['title'] ?? 'N/A',
-                                    'date_key' => $taskDateKey,
-                                    'date_value' => $task[$taskDateKey] ?? 'N/A',
-                                    'parsed_date' => $taskDate ? $taskDate->toDateTimeString() : 'N/A',
-                                    'isBetween' => $isTaskDateBetween,
-                                    'totalTasksCumulative' => $totalTasks
-                                ]);
-                            } else {
-                                \Log::info('Tâche non ajoutée', [
-                                    'calendar_id' => $calendar->id,
-                                    'task_title' => $task['title'] ?? 'N/A',
-                                    'date_key' => $taskDateKey,
-                                    'date_value' => $task[$taskDateKey] ?? 'N/A',
-                                    'parsed_date' => $taskDate ? $taskDate->toDateTimeString() : 'N/A',
-                                    'isBetween' => $isTaskDateBetween,
-                                    'totalTasksCumulative' => $totalTasks
-                                ]);
-                            }
-                        }
-                    }
-                    \Log::info('Calendar Task', [
-                        'calendar_id' => $calendar->id,
-                        'date' => $calendar->date,
-                        'tacheList' => $calendar->tacheList,
-                        'totalTasksCumulative' => $totalTasks
-                    ]);
-                }
-            }
-
-            \Log::info('Valeurs pour le Graphique', [
-                'totalHours' => $totalHours,
-                'monthlyScreenshots' => $monthlyScreenshots,
-                'totalTasks' => $totalTasks
-            ]);
-            @endphp
-
-            <div id="chartContainer">
-                <canvas id="monthlyStatsChart" style="max-width: 400px; max-height: 400px; margin: 0 auto;"></canvas>
+                </div>
             </div>
-            <div id="noDataMessage" style="display: none; text-align: center; margin-top: 10px;">
-                <p>Aucune donnée disponible pour ce mois.</p>
+        </div>
+    </div>
+
+    <!-- Boutons -->
+    <div id="button-container" style="position: absolute; left: 10px; top: 300px; z-index: 10; display: flex; flex-direction: column; gap: 10px;" class="button-container">
+        <a href="{{ route('teletravailleur.dashboard') }}" class="btn btn-primary rounded-pill px-4 py-2" style="display: flex; align-items: center; justify-content: center; backdrop-filter: blur(10px);">
+            <img src="{{ asset('images/chrono.png') }}" alt="Chrono Icon" style="width: 55px; height: 53px; margin-right: 10px; margin-left: 110px;">
+            ChronoPanel
+        </a>
+        <div class="button-wrapper">
+            <a href="#" class="btn btn-primary rounded-pill px-4 py-2 default-button" style="display: flex; align-items: center; justify-content: center; width: 525px; height: 75px; margin-left: -480px;">
+                <img src="{{ asset('images/Component.png') }}" alt="Component Icon" style="width: 38px; height: 22px; margin-right: 30px; margin-left: 460px;">
+            </a>
+            <a href="{{ route('calendars.index') }}" class="btn btn-primary rounded-pill px-4 py-2 hidden-button" style="display: none; align-items: center; justify-content: center; width: 525px; height: 75px; backdrop-filter: blur(10px);">
+                <img src="{{ asset('images/calendar.png') }}" alt="Calendar Icon" style="width: 38px; height: 38px; margin-right: 40px; margin-left: 90px;">
+                Calendar
+            </a>
+        </div>
+    </div>
+
+
+
+    <!-- Conteneur pour le timer et les détails -->
+    <div style="margin-left: 360px; min-height: calc(100vh - 40px); padding: 20px 0 20px 20px; max-width: none; width: calc(100% - 300px);">
+        <div class="container-fluid" style="color: white; padding-right: 0; margin-right: 0;">
+            @if (session('status'))
+                <div class="alert alert-success">{{ session('status') }}</div>
+            @endif
+            @if (session('error'))
+                <div class="alert alert-danger">{{ session('error') }}</div>
+            @endif
+            @if ($notification)
+                <div class="alert alert-info" role="alert">{{ $notification }}</div>
+            @endif
+            <div id="captureNotification" class="alert alert-success" style="display: none; position: fixed; bottom: 20px; right: 20px; z-index: 1000;">
+                Capture enregistrée avec succès !
             </div>
 
-            <script>
-                function loadChart() {
-                    if (typeof Chart === 'undefined') {
-                        const chartScript = document.createElement('script');
-                        chartScript.src = 'https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js';
-                        chartScript.onload = function() {
-                            const datalabelsScript = document.createElement('script');
-                            datalabelsScript.src = 'https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0/dist/chartjs-plugin-datalabels.min.js';
-                            datalabelsScript.onload = function() {
-                                createOrUpdateChart();
-                            };
-                            datalabelsScript.onerror = function() {
-                                console.error('Erreur lors du chargement de chartjs-plugin-datalabels');
-                                document.getElementById('chartContainer').innerHTML = '<p style="text-align: center;">Erreur lors du chargement des étiquettes du graphique.</p>';
-                            };
-                            document.head.appendChild(datalabelsScript);
-                        };
-                        chartScript.onerror = function() {
-                            console.error('Erreur lors du chargement de Chart.js');
-                            document.getElementById('chartContainer').innerHTML = '<p style="text-align: center;">Erreur lors du chargement du graphique.</p>';
-                        };
-                        document.head.appendChild(chartScript);
-                    } else {
-                        createOrUpdateChart();
-                    }
-                }
+            <br>
+            <!-- Timer Section -->
+            <div style="text-align: center; margin-bottom: 20px;  ">
+                <div style="width: 675px; height: 80px; font-size: 60px; font-weight: bold; color: #FFFFFF; margin: 10px auto; background: rgba(0, 0, 0, 0.5); border-radius: 77px; border: 1px solid #444; display: flex; align-items: center; justify-content: center; padding: 0 15px; backdrop-filter: blur(10px); font-family: 'Jersey 25', sans-serif; ">
+                    <span id="timerDisplay">00:00:00</span>
+                </div>
+                <div style="display: flex; justify-content: center; gap: 10px; margin-top: 20px;">
+                    <button id="startBtn" class="btn btn-success rounded-pill" style="background: rgba(0, 0, 0, 0.5); border-radius: 77px; border: 1px solid #444; padding: 10px 20px; display: flex; align-items: center; justify-content: center; width: 151px; height: 55px;backdrop-filter: blur(10px);">
+                        <img src="{{ asset('images/start.png') }}" alt="Start Icon" style="width: 50px; height: 50px; margin-right: 10px;">
+                        <span style="color: #FFFFFF; font-size: 16px; font-weight: bold;">Start</span>
+                    </button>
+                    <button id="pauseBtn" class="btn btn-warning rounded-pill" style="background: rgba(0, 0, 0, 0.5); border-radius: 77px; border: 1px solid #444; padding: 10px 20px; display: flex; align-items: center; justify-content: center; width: 151px; height: 55px; backdrop-filter: blur(10px);" disabled>
+                        <img src="{{ asset('images/pause.png') }}" alt="Pause Icon" style="width: 35px; height: 35px; margin-right: 10px;">
+                        <span style="color: #FFFFFF; font-size: 16px; font-weight: bold;">Pause</span>
+                    </button>
+                    <button id="resumeBtn" class="btn btn-info rounded-pill" style="background: rgba(0, 0, 0, 0.5); border-radius: 77px; border: 1px solid #444; padding: 10px 20px; display: flex; align-items: center; justify-content: center; width: 151px; height: 55px;backdrop-filter: blur(10px);" disabled>
+                        <img src="{{ asset('images/resume.png') }}" alt="Resume Icon" style="width: 50px; height: 50px; margin-right: 10px;">
+                        <span style="color: #FFFFFF; font-size: 16px; font-weight: bold;">Resume</span>
+                    </button>
+                    <button id="stopBtn" class="btn btn-danger rounded-pill" style="background: rgba(0, 0, 0, 0.5); border-radius: 77px; border: 1px solid #444; padding: 10px 20px; display: flex; align-items: center; justify-content: center; width: 151px; height: 55px;backdrop-filter: blur(10px);" disabled>
+                        <img src="{{ asset('images/stop.png') }}" alt="Stop Icon" style="width: 28px; height: 28px; margin-right: 10px;">
+                        <span style="color: #FFFFFF; font-size: 16px; font-weight: bold;">Stop</span>
+                    </button>
+                </div>
+            </div>
 
-                let monthlyStatsChartInstance = null;
+            <br>
 
-                function createOrUpdateChart() {
-                    const ctx = document.getElementById('monthlyStatsChart').getContext('2d');
+            <!-- Carte pour les sections -->
+            <div class="card" style="background: rgba(0, 0, 0, 0.5); border-radius: 77px; padding: 15px; border: 1px solid #444; width: 1060px; height: 350px; overflow-y: auto; position: relative; padding-right: 10px; backdrop-filter: blur(10px); scrollbar-width: none; -ms-overflow-style: none; margin-top: 20px;">
+                <br>
 
-                    if (monthlyStatsChartInstance) {
-                        monthlyStatsChartInstance.destroy();
-                    }
+                <!-- Section Suivi des Heures -->
+                <div class="section-content">
 
-                    let hours = <?php echo $totalHours ?: 0; ?>;
-                    let screenshots = <?php echo $monthlyScreenshots ?: 0; ?>;
-                    let tasks = <?php echo $totalTasks ?: 0; ?>;
+                    <a href="{{ route('teletravailleur.chat.index') }}" class="btn btn-primary rounded-pill px-4 py-2" style="display: flex; align-items: center; justify-content: end;  margin-bottom: -45px; margin-right: 20px;font-size: 20px; font-weight: bold;">
+                        <img src="{{ asset('images/chatbot.png') }}" alt="Chatbot Icon" style="width: 44px; height: 26.5px; margin-right: 5px; margin-left: 30px; ">
+                        CHATBOT
+                    </a>
 
-                    if (hours === 0 && screenshots === 0 && tasks === 0) {
-                        document.getElementById('chartContainer').style.display = 'none';
-                        document.getElementById('noDataMessage').style.display = 'block';
-                        return;
-                    } else {
-                        document.getElementById('chartContainer').style.display = 'block';
-                        document.getElementById('noDataMessage').style.display = 'none';
-                    }
+                    <h4 style="font-weight: bold; font-size: 25px; margin-left: 20px;">Hours Tracked</h4>
 
-                    if (hours === 0) hours = 0.001;
-                    if (screenshots === 0) screenshots = 0.001;
-                    if (tasks === 0) tasks = 0.001;
+                    @php
+    // Calculer le total du jour
+    $todaySeconds = 0;
+    $todaySessions = \App\Models\WorkingHour::where('teletravailleur_id', $teletravailleur->id)
+        ->where('date', now()->toDateString())
+        ->whereNotNull('stop_time')
+        ->get();
+    foreach ($todaySessions as $session) {
+        $effectiveSeconds = $session->total_seconds - ($session->pause_total_seconds ?? 0);
+        $todaySeconds += max(0, $effectiveSeconds);
+    }
+    $hours = floor($todaySeconds / 3600);
+    $remainingSeconds = $todaySeconds % 3600;
+    $minutes = floor($remainingSeconds / 60);
+    $seconds = $remainingSeconds % 60;
+    $todayFormattedCorrected = "{$hours}h {$minutes}m {$seconds}s";
 
-                    const total = hours + screenshots + tasks;
+    // Calculer le total mensuel
+    $selectedMonth = request()->input('month', now()->format('Y-m'));
+    $startOfMonth = \Carbon\Carbon::createFromFormat('Y-m', $selectedMonth)->startOfMonth();
+    $endOfMonth = \Carbon\Carbon::createFromFormat('Y-m', $selectedMonth)->endOfMonth();
+    $monthlySessions = \App\Models\WorkingHour::where('teletravailleur_id', $teletravailleur->id)
+        ->whereBetween('date', [$startOfMonth, $endOfMonth])
+        ->whereNotNull('stop_time')
+        ->get();
+    $monthlySeconds = 0;
+    foreach ($monthlySessions as $session) {
+        $effectiveSeconds = $session->total_seconds - ($session->pause_total_seconds ?? 0);
+        $monthlySeconds += max(0, $effectiveSeconds);
+    }
+    $hours = floor($monthlySeconds / 3600);
+    $remainingSeconds = $monthlySeconds % 3600;
+    $minutes = floor($remainingSeconds / 60);
+    $seconds = $remainingSeconds % 60;
+    $monthlyFormattedCorrected = "{$hours}h {$minutes}m {$seconds}s";
+@endphp
 
-                    Chart.register(window.ChartDataLabels);
+<p style="margin-top: 17px; margin-left: 20px;">Time Tracked Today : <span id="todayHours" style="margin-left: 60px">{{ $todayFormattedCorrected }}</span></p>
+<p style="margin-top: 5px; margin-left: 20px;">Monthly Total : <span id="monthlyHours" style="margin-left: 114px">{{ $monthlyFormattedCorrected }}</span></p>
 
-                    monthlyStatsChartInstance = new Chart(ctx, {
-                        type: 'pie',
-                        data: {
-                            labels: ['Heures Travaillées (h)', 'Captures d\'Écran', 'Tâches'],
-                            datasets: [{
-                                label: 'Statistiques Mensuelles',
-                                data: [hours, screenshots, tasks],
-                                backgroundColor: [
-                                    'rgba(54, 162, 235, 0.7)',
-                                    'rgba(255, 99, 132, 0.7)',
-                                    'rgba(75, 192, 192, 0.7)',
-                                ],
-                                borderColor: [
-                                    'rgba(54, 162, 235, 1)',
-                                    'rgba(255, 99, 132, 1)',
-                                    'rgba(75, 192, 192, 1)',
-                                ],
-                                borderWidth: 1
-                            }]
-                        },
-                        options: {
-                            responsive: true,
-                            maintainAspectRatio: true,
-                            plugins: {
-                                legend: {
-                                    position: 'top',
-                                },
-                                title: {
-                                    display: true,
-                                    text: 'Statistiques Mensuelles - <?php echo $selectedDate->format('F Y'); ?>',
-                                    font: {
-                                        size: 16
+                </div>
+
+                <!-- Ligne de séparation -->
+                <hr class="section-divider">
+
+                <!-- Section Historique des Captures d'Écran -->
+                <div class="section-content">
+                    <h4 style="font-weight: bold; font-size: 25px; margin-left: 20px;">Screenshots History</h4>
+                    <br>
+                    <div style="display: grid; grid-template-columns: 1fr 2fr 1fr; gap: 20px; padding: 10px 20px;">
+                        <p style="color: #A19B9B; font-weight: bold; text-align: left; font-size: 18px;">Date</p>
+                        <p style="color: #A19B9B; font-weight: bold; text-align: center; font-size: 18px;">Screenshots</p>
+                        <p style="color: #A19B9B; font-weight: bold; text-align: center; font-size: 18px;">Actions</p>
+                    </div>
+                    <hr class="section-divider">
+                    @if($screenshots->isEmpty())
+                        <p class="text-muted" style="margin-left: 20px;">No screenshots recorded.</p>
+                    @else
+                        @foreach($screenshots as $screenshot)
+                            <div style="display: grid; grid-template-columns: 1fr 2fr 1fr; gap: 20px; padding: 10px 20px; align-items: center; border-radius: 10px; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);">
+                                <p style="color: #FFFFFF; font-size: 16px; text-align: left;">{{ $screenshot->created_at->format('d/m/Y H:i') }}</p>
+                                <div style="text-align: center; display: flex; justify-content: center;">
+                                    <img src="{{ asset('storage/' . $screenshot->image_path) }}" alt="Screenshot" style="max-width: 100px; max-height: 100px; border-radius: 10px;" onerror="this.src='{{ asset('images/default-screenshot.png') }}';">
+                                </div>
+                                <div style="display: flex; justify-content: center; gap: 10px; align-items: center;">
+                                    <a href="{{ asset('storage/' . $screenshot->image_path) }}" target="_blank" class="btn btn-secondary btn-sm rounded-pill" style="font-size: 16px; padding: 5px 10px;">View In Full Screen</a>
+                                </div>
+                            </div>
+                        @endforeach
+                        <div style="display: grid; grid-template-columns: 1fr 2fr 1fr; gap: 20px; padding: 10px 20px; margin-top: 20px;">
+                            <div></div>
+                            <div></div>
+                            <div style="text-align: center;">
+                                {{ $screenshots->links() }}
+                            </div>
+                        </div>
+                    @endif
+                </div>
+
+                <!-- Ligne de séparation -->
+                <hr class="section-divider">
+
+                <!-- Section Historique des Heures -->
+                <div class="section-content">
+                    <h4 style="font-weight: bold; font-size: 25px; margin-left: 20px;">Hours History</h4>
+                    <br>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 2fr; gap: 20px; padding: 10px 20px;">
+                        <p style="color: #A19B9B; font-weight: bold; text-align: left; font-size: 18px;">Date</p>
+                        <p style="color: #A19B9B; font-weight: bold; text-align: center; font-size: 18px;">Start</p>
+                        <p style="color: #A19B9B; font-weight: bold; text-align: center; font-size: 18px;">End</p>
+                        <p style="color: #A19B9B; font-weight: bold; text-align: center; font-size: 18px;">Total Hours</p>
+                    </div>
+                    <hr class="section-divider">
+                    @if($workingHours->isEmpty())
+                        <p class="text-muted" style="margin-left: 20px;">No hours recorded.</p>
+                    @else
+                        @foreach($workingHours as $hour)
+                            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 2fr; gap: 20px; padding: 10px 20px; align-items: center; border-radius: 10px; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);">
+                                <p style="color: #FFFFFF; font-size: 16px; text-align: left;">{{ $hour->date ? $hour->date->format('d/m/Y') : 'Not set' }}</p>
+                                <p style="color: #FFFFFF; font-size: 16px; text-align: center;">{{ $hour->start_time ? $hour->start_time->format('H:i:s') : 'Not set' }}</p>
+                                <p style="color: #FFFFFF; font-size: 16px; text-align: center;">{{ $hour->stop_time ? $hour->stop_time->format('H:i:s') : 'Not set' }}</p>
+                                <p style="color: #FFFFFF; font-size: 16px; text-align: center;">
+                                    @php
+                                        $effectiveSeconds = $hour->total_seconds - ($hour->pause_total_seconds ?? 0);
+                                        if ($effectiveSeconds < 0) $effectiveSeconds = $hour->total_seconds;
+                                        $hours = floor($effectiveSeconds / 3600);
+                                        $remainingSeconds = $effectiveSeconds % 3600;
+                                        $minutes = floor($remainingSeconds / 60);
+                                        $seconds = $remainingSeconds % 60;
+                                        echo "{$hours}h {$minutes}m {$seconds}s";
+                                    @endphp
+                                </p>
+                            </div>
+                        @endforeach
+                        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 2fr; gap: 20px; padding: 10px 20px; margin-top: 20px;">
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                            <div style="text-align: center;">
+                                {{ $workingHours->links() }}
+                            </div>
+                        </div>
+                    @endif
+                </div>
+
+                <!-- Ligne de séparation -->
+                <hr class="section-divider">
+
+                <!-- Section Statistiques Mensuelles -->
+                <div class="section-content">
+                    <h4 style="font-weight: bold; font-size: 25px; margin-left: 20px;">Monthly Statistics</h4>
+                    <br>
+                    <form method="GET" action="{{ route('teletravailleur.dashboard') }}" class="mb-3">
+                        <div class="form-group">
+                            <label style="font-weight: bold; font-size: 17px; margin-left: 20px;" for="month">Select a month :</label>
+                            <input type="month" id="month" name="month" value="{{ request()->input('month', now()->setTimezone('UTC')->format('Y-m')) }}" class="form-control d-inline-block w-auto text-dark" style="background-color: #f0f0f0; border-radius: 7px; padding: 8px 12px; font-size: 16px; color: #000A44; border: 1px solid #ccc; width: 150px; height: 38px;">
+                            <input type="hidden" name="t" value="{{ now()->timestamp }}">
+                            <button type="submit" class="btn btn-primary" style="background-color: #0A22B9; color: #FFFFFF; border-radius: 7px; padding: 10px 20px; font-size: 15px; border: none; height: 40px; width: 100px;">Show</button>
+                        </div>
+                    </form>
+                    @php
+                        $userId = $user->id;
+                        $teletravailleurId = $teletravailleur->id;
+
+                        $selectedMonth = request()->input('month', now()->setTimezone('UTC')->format('Y-m'));
+                        $selectedDate = \Carbon\Carbon::createFromFormat('Y-m', $selectedMonth, 'UTC')->startOfMonth();
+                        $startOfMonth = $selectedDate->copy()->startOfDay();
+                        $endOfMonth = $selectedDate->copy()->endOfMonth()->endOfDay();
+
+                        // Utiliser la valeur calculée dans "Hours Tracked" au lieu de recalculer
+                        $monthlySeconds = $monthlySeconds ?? 0;
+                        $totalHours = round($monthlySeconds / 3600, 2);
+
+                        $monthlyScreenshots = \App\Models\Screenshot::where('teletravailleur_id', $teletravailleurId)
+                            ->whereBetween('created_at', [$startOfMonth, $endOfMonth])
+                            ->count();
+
+                        $totalTasks = 0;
+                        $calendars = \App\Models\Calendar::where('user_id', $userId)->get();
+                        foreach ($calendars as $calendar) {
+                            if (!empty($calendar->tacheList)) {
+                                $tasks = is_array($calendar->tacheList) ? $calendar->tacheList : [];
+                                foreach ($tasks as $task) {
+                                    $taskDateKey = isset($task['deadline']) ? 'deadline' : null;
+                                    $taskDate = $taskDateKey ? \Carbon\Carbon::parse($task[$taskDateKey])->setTimezone('UTC') : null;
+                                    if ($taskDate && $taskDate->between($startOfMonth, $endOfMonth)) {
+                                        $totalTasks += 1;
                                     }
-                                },
-                                tooltip: {
-                                    enabled: true,
-                                    callbacks: {
-                                        label: function(context) {
-                                            let label = context.label || '';
-                                            if (label) {
-                                                label += ': ';
-                                            }
-                                            let value = context.parsed;
-                                            if (value === 0.001) value = 0;
-                                            label += value + (context.label === 'Heures Travaillées (h)' ? ' heures' : '');
-                                            return label;
-                                        }
-                                    }
-                                },
-                                datalabels: {
-                                    color: '#fff',
-                                    font: {
-                                        weight: 'bold',
-                                        size: 14
-                                    },
-                                    formatter: (value, context) => {
-                                        let realValue = value === 0.001 ? 0 : value;
-                                        if (realValue === 0) return '';
-                                        const percentage = ((realValue / total) * 100).toFixed(1);
-                                        return percentage + '%';
-                                    },
-                                    anchor: 'center',
-                                    align: 'center'
                                 }
                             }
                         }
-                    });
-                }
-
-                document.addEventListener('DOMContentLoaded', function() {
-                    loadChart();
-                });
-            </script>
+                    @endphp
+                    <div id="chartContainer">
+                        <canvas id="monthlyStatsChart" style="max-width: 400px; max-height: 400px; margin: 0 auto;"></canvas>
+                    </div>
+                    <div id="noDataMessage" style="display: none; text-align: center; margin-top: 10px;">
+                        <p>No data available for this month.</p>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
 
-<!-- JavaScript pour gérer le timer et les captures automatiques -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+<style>
+    .table th, .table td { vertical-align: middle; }
+    .d-flex > .btn { flex-shrink: 0; white-space: nowrap; }
+    .button-container { align-items: flex-start; padding: 5px; border-radius: 10px; }
+    .button-container a { display: inline-block; padding: 10px 20px; text-align: center; text-decoration: none; color: #E1E4E6; background: rgba(0, 0, 0, 0.5); border: 1px solid #444; border-radius: 77px; font-weight: bold; font-size: 28px; width: 525px; height: 75px; margin-left: -180px; }
+    .hidden-button { display: none; }
+    .button-wrapper { position: relative; width: 525px; height: 75px; }
+    .button-wrapper .default-button { display: flex; position: absolute; top: 0; left: 0; }
+    .button-wrapper .hidden-button { display: none; position: absolute; top: 0; left: 0; }
+    .button-wrapper:hover .default-button { display: none !important; }
+    .button-wrapper:hover .hidden-button { display: flex !important; }
+    .table-dark th, .table-dark td { border: none; }
+    .table-dark tr:hover { background: rgba(255, 255, 255, 0.1); }
+    .badge.bg-success { background-color: #28a745 !important; }
+    .badge.bg-danger { background-color: #dc3545 !important; }
+    .section-divider { border-top: 1px solid #444; margin: 20px 0; }
+    .section-content { padding: 10px 0; }
+
+</style>
+
 <script>
+    function formatTime(hours) {
+        const totalSeconds = Math.round(hours * 3600);
+        const h = Math.floor(totalSeconds / 3600);
+        const m = Math.floor((totalSeconds % 3600) / 60);
+        const s = totalSeconds % 60;
+        return `${h}h ${m}m ${s}s`;
+    }
+
+    // Supprimer l'utilisation de todayHoursElement et monthlyHoursElement car on utilise $todayFormatted et $monthlyFormatted
+    // Ces éléments ne sont plus nécessaires ici, car le formatage est déjà fait dans le contrôleur
+
+    // Timer JavaScript
     let timerInterval;
     let screenshotInterval = null;
     let totalSeconds = 0;
@@ -421,8 +331,7 @@
         const hours = Math.floor(totalSeconds / 3600);
         const minutes = Math.floor((totalSeconds % 3600) / 60);
         const seconds = totalSeconds % 60;
-        document.getElementById('timer').textContent = `Temps de la session en cours : ${hours}h ${minutes}m ${seconds}s`;
-        document.getElementById('session-time').textContent = `${hours}h ${minutes}m ${seconds}s`;
+        document.getElementById('timerDisplay').textContent = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
     }
 
     function stopScreenshotInterval() {
@@ -580,6 +489,7 @@
                     document.getElementById('resumeBtn').disabled = false;
                     console.log(data.message);
                 }
+
             } catch (error) {
                 console.error('Erreur lors de la pause:', error);
                 showNotification('Une erreur s\'est produite lors de la pause : ' + error.message);
@@ -601,6 +511,7 @@
                 });
 
                 const data = await response.json();
+
 
                 if (!response.ok) {
                     throw new Error(`Erreur réseau ou serveur : ${response.status} - ${data.error || 'Erreur inconnue'}`);
@@ -630,58 +541,58 @@
     });
 
     document.getElementById('stopBtn').addEventListener('click', async () => {
-        try {
-            console.log('Arrêt de la session à :', new Date());
-            const response = await fetch('{{ route("teletravailleur.working-hours.stop") }}', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                },
-                credentials: 'include'
-            });
+    try {
+        console.log('Arrêt de la session à :', new Date());
+        const effectiveSeconds = totalSeconds - Math.floor(pausedTime / 1000); // Convertir pausedTime en secondes
+        const response = await fetch('{{ route("teletravailleur.working-hours.stop") }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            },
+            credentials: 'include',
+            body: JSON.stringify({ total_seconds: effectiveSeconds }) // Envoyer uniquement le temps effectif
+        });
 
-            const data = await response.json();
+        const data = await response.json();
 
-            if (!response.ok) {
-                throw new Error(`Erreur réseau ou serveur : ${response.status} - ${data.error || 'Erreur inconnue'}`);
-            }
-
-            if (data.error) {
-                showNotification(data.error);
-            } else {
-                if (totalSeconds >= 600) {
-                    console.log('Déclenchement d’une capture d’écran à l’arrêt de la session.');
-                    try {
-                        await captureScreenshot();
-                    } catch (captureError) {
-                        console.error('Erreur lors de la capture à l’arrêt :', captureError);
-                    }
-                } else {
-                    console.log('Pas de capture à l’arrêt : session trop courte.', totalSeconds);
-                }
-
-                clearInterval(timerInterval);
-                stopScreenshotInterval();
-                totalSeconds = 0;
-                lastScreenshotTime = null;
-                pausedTime = 0;
-                isPaused = false;
-                document.getElementById('timer').textContent = 'Temps de la session en cours : 0h 0m 0s';
-                document.getElementById('session-time').textContent = '0h 0m 0s';
-                document.getElementById('startBtn').disabled = false;
-                document.getElementById('pauseBtn').disabled = true;
-                document.getElementById('resumeBtn').disabled = true;
-                document.getElementById('stopBtn').disabled = true;
-                console.log(data.message);
-                location.reload();
-            }
-        } catch (error) {
-            console.error('Erreur lors de l\'arrêt:', error);
-            showNotification('Une erreur s\'est produite lors de l\'arrêt : ' + error.message);
+        if (!response.ok) {
+            throw new Error(`Erreur réseau ou serveur : ${response.status} - ${data.error || 'Erreur inconnue'}`);
         }
-    });
 
+        if (data.error) {
+            showNotification(data.error);
+        } else {
+            if (effectiveSeconds >= 600) {
+                console.log('Déclenchement d’une capture d’écran à l’arrêt de la session.');
+                try {
+                    await captureScreenshot();
+                } catch (captureError) {
+                    console.error('Erreur lors de la capture à l’arrêt :', captureError);
+                }
+            } else {
+                console.log('Pas de capture à l’arrêt : session trop courte.', effectiveSeconds);
+            }
+
+            clearInterval(timerInterval);
+            stopScreenshotInterval();
+            totalSeconds = 0;
+            lastScreenshotTime = null;
+            pausedTime = 0;
+            isPaused = false;
+            document.getElementById('timerDisplay').textContent = '00:00:00';
+            document.getElementById('startBtn').disabled = false;
+            document.getElementById('pauseBtn').disabled = true;
+            document.getElementById('resumeBtn').disabled = true;
+            document.getElementById('stopBtn').disabled = true;
+            console.log(data.message);
+            location.reload();
+        }
+    } catch (error) {
+        console.error('Erreur lors de l\'arrêt:', error);
+        showNotification('Une erreur s\'est produite lors de l\'arrêt : ' + error.message);
+    }
+});
     window.onbeforeunload = function() {
         if (timerInterval || isPaused) {
             fetch('{{ route("teletravailleur.working-hours.stop") }}', {
@@ -702,9 +613,91 @@
         }, 30 * 1000);
     }
     keepPageActive();
+
+    // Chart JS
+    function loadChart() {
+        if (typeof Chart === 'undefined') {
+            const chartScript = document.createElement('script');
+            chartScript.src = 'https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js';
+            chartScript.onload = function() {
+                const datalabelsScript = document.createElement('script');
+                datalabelsScript.src = 'https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0/dist/chartjs-plugin-datalabels.min.js';
+                datalabelsScript.onload = function() {
+                    createOrUpdateChart();
+                };
+                document.head.appendChild(datalabelsScript);
+            };
+            document.head.appendChild(chartScript);
+        } else {
+            createOrUpdateChart();
+        }
+    }
+
+    let monthlyStatsChartInstance = null;
+
+    function createOrUpdateChart() {
+        const ctx = document.getElementById('monthlyStatsChart').getContext('2d');
+
+        if (monthlyStatsChartInstance) {
+            monthlyStatsChartInstance.destroy();
+        }
+
+        let hours = <?php echo $totalHours ?: 0; ?>;
+        let screenshots = <?php echo $monthlyScreenshots ?: 0; ?>;
+        let tasks = <?php echo $totalTasks ?: 0; ?>;
+
+        if (hours === 0 && screenshots === 0 && tasks === 0) {
+            document.getElementById('chartContainer').style.display = 'none';
+            document.getElementById('noDataMessage').style.display = 'block';
+            return;
+        } else {
+            document.getElementById('chartContainer').style.display = 'block';
+            document.getElementById('noDataMessage').style.display = 'none';
+        }
+
+        if (hours === 0) hours = 0.001;
+        if (screenshots === 0) screenshots = 0.001;
+        if (tasks === 0) tasks = 0.001;
+
+        const total = hours + screenshots + tasks;
+
+        Chart.register(window.ChartDataLabels);
+
+        monthlyStatsChartInstance = new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: ['Worked Hours (h)', 'Screenshots', 'Tasks'],
+                datasets: [{
+                    label: 'Monthly Statistics',
+                    data: [hours, screenshots, tasks],
+                    backgroundColor: [
+                        'rgba(54, 162, 235, 0.7)',
+                        'rgba(255, 99, 132, 0.7)',
+                        'rgba(75, 192, 192, 0.7)',
+                    ],
+                    borderColor: [
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(75, 192, 192, 1)',
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    legend: { position: 'top', labels: { color: '#fff' } },
+                    title: { display: true, text: 'Monthly Statistics - <?php echo $selectedDate->format('F Y'); ?>', font: { size: 16 }, color: '#fff' },
+                    tooltip: { enabled: true, callbacks: { label: function(context) { let label = context.label || ''; if (label) label += ': '; let value = context.parsed; if (value === 0.001) value = 0; label += value + (context.label === 'Worked Hours (h)' ? ' hours' : ''); return label; } } },
+                    datalabels: { color: '#fff', font: { weight: 'bold', size: 14 }, formatter: (value, context) => { let realValue = value === 0.001 ? 0 : value; if (realValue === 0) return ''; const percentage = ((realValue / total) * 100).toFixed(1); return percentage + '%'; }, anchor: 'center', align: 'center' }
+                }
+            }
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        loadChart();
+    });
 </script>
-
-<!-- Inclusion de Font Awesome pour les icônes -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" integrity="sha512-Fo3rlrZj/k7ujTnHg4CGR2D7kSs0v4LLanw2qksYuRlEzO+tcaEPQogQ0KaoGN26/zrn20ImR1DfuLWnOo7aBA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-
 @endsection

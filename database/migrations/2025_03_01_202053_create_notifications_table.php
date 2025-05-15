@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('notifications', function (Blueprint $table) {
             $table->id(); // id: int [PK]
-            $table->string('contenu'); // contenu: text
+            $table->string('contenu');
             $table->unsignedBigInteger('teletravailleur_id');
             $table->foreign('teletravailleur_id')->references('id')->on('teletravailleurs')->onDelete('cascade');
             $table->timestamps();

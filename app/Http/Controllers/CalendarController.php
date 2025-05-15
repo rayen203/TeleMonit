@@ -32,6 +32,7 @@ class CalendarController extends Controller
         return view('calendars.index', compact('calendars'));
     }
 
+
     // Afficher le formulaire pour ajouter une tâche
     public function createTask($date)
     {
@@ -46,8 +47,16 @@ class CalendarController extends Controller
             'request_data' => $request->all(),
         ]);
 
-        // Récupérer directement l'ID de l'utilisateur connecté
-        $userId = auth()->id();
+        // Récupérer l'email de l'utilisateur connecté et convertir en ID
+        $email = auth()->id();
+        \Log::info('Valeur de auth()->id() dans storeTask', ['email' => $email]);
+        $user = \App\Models\Utilisateur::where('email', $email)->first();
+        if (!$user) {
+            \Log::error('Utilisateur non trouvé dans storeTask', ['email' => $email]);
+            return redirect()->route('calendars.index')->withErrors(['error' => 'Utilisateur non trouvé.']);
+        }
+        $userId = $user->id;
+        \Log::info('Utilisateur trouvé, ID converti', ['user_id' => $userId]);
 
         if (!$userId) {
             \Log::error('Utilisateur non connecté', ['user_id' => $userId]);

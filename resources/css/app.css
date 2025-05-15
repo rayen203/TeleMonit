@@ -1,2 +1,9 @@
 
-/* Aucun style global nécessaire pour l'instant */
+/* @tailwind base; */
+/* @tailwind components; */
+/* @tailwind utilities; */
+
+/* Solution pour VS Code */
+@import "tailwindcss/base";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";

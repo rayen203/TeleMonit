@@ -273,6 +273,42 @@ public function changePassword(Request $request, $token)
             return redirect()->route('login')->withErrors(['error' => 'Le lien de complétion est invalide ou a déjà été utilisé.']);
         }
 
+        // Cas 1 : avatar prédéfini
+    if ($request->has('avatar')) {
+        $avatarName = $request->input('avatar');
+        $path = 'images/' . $avatarName;
+
+        if (file_exists(public_path($path))) {
+            if ($teletravailleur->photoProfil) {
+                Storage::disk('public')->delete($teletravailleur->photoProfil);
+            }
+
+            $teletravailleur->update(['photoProfil' => $path]);
+
+            \Log::info('Avatar sélectionné avec succès', ['path' => $path, 'teletravailleur_id' => $teletravailleur->id]);
+
+            $teletravailleur->update(['token' => null]);
+
+            if ($teletravailleur->utilisateur) {
+                $teletravailleur->utilisateur->update(['statut' => true]);
+                \Log::info('Utilisateur statut updated', ['user_id' => $teletravailleur->utilisateur->id]);
+            } else {
+                \Log::error('Utilisateur associé non trouvé', ['teletravailleur_id' => $teletravailleur->id]);
+                return redirect()->route('login')->withErrors(['error' => 'Utilisateur associé non trouvé.']);
+            }
+
+            return redirect()->to('/login')
+                ->with('success', 'Avatar sélectionné avec succès ! Veuillez vous connecter.')
+                ->with('completed', true);
+        } else {
+            \Log::error('Avatar non trouvé', ['avatar' => $avatarName, 'teletravailleur_id' => $teletravailleur->id]);
+            return redirect()->back()->withErrors(['avatar' => 'L\'avatar sélectionné n\'existe pas.']);
+        }
+    }
+
+
+
+        // Cas 2 : importer photo
         $validatedData = $request->validate([
             'photoProfil' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);

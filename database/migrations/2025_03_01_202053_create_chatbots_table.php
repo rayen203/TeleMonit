@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::create('chatbots', function (Blueprint $table) {
             $table->id();
 
-            $table->unsignedBigInteger('sessionId'); // session: string
-            $table->json('historique')->nullable(); // historique: JSON
+            $table->unsignedBigInteger('sessionId');
+            $table->json('historique')->nullable();
             $table->unsignedBigInteger('teletravailleur_id')->unique();
             $table->foreign('teletravailleur_id')->references('id')->on('utilisateurs')->onDelete('cascade');
             $table->timestamps();

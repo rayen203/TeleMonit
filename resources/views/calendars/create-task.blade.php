@@ -1,11 +1,13 @@
-@extends('layouts.app')
+@extends('layouts.base-interface')
 
 @section('content')
-<div class="container">
-    <h1>Ajouter une Tâche pour le {{ \Carbon\Carbon::parse($date)->format('d/m/Y') }}</h1>
+<div class="relative z-10 bg-white/10 backdrop-blur-lg border-2 border-gray-500 rounded-[100px] shadow-xl px-10 py-12 w-[894px] h-[708px] text-center transform scale-75">
+    <h1 class="text-[#E3EDEF] text-4xl sm:text-5xl font-semibold mb-8 leading-tight tracking-wide font-poppins">
+        Schedule a task for {{ \Carbon\Carbon::parse($date)->format('d/m/Y') }}?
+    </h1>
 
     @if ($errors->any())
-        <div class="alert alert-danger">
+        <div class="bg-red-100 text-red-700 px-4 py-2 rounded mb-4 font-poppins">
             <ul>
                 @foreach ($errors->all() as $error)
                     <li>{{ $error }}</li>
@@ -14,25 +16,54 @@
         </div>
     @endif
 
-    <form method="POST" action="{{ route('calendars.tasks.store', $date) }}">
+    <form method="POST" action="{{ route('calendars.tasks.store', $date) }}" class="flex flex-col items-center space-y-6">
         @csrf
-        <div class="mb-3">
-            <label for="title" class="form-label">Titre</label>
-            <input type="text" class="form-control" id="title" name="title" value="{{ old('title') }}" required>
+
+        <!-- Champ Titre -->
+        <div class="w-[745px]">
+
+            <input type="text" id="title" name="title" value="{{ old('title') }}" required
+                   class="w-full h-[68px] px-4 rounded-[57px] bg-[#D9D9D9] opacity-100 text-gray-700 font-semibold font-poppins border-none focus:outline-none placeholder:text-xl"
+                   placeholder="Task title:">
+            <x-input-error :messages="$errors->get('title')" class="mt-1 text-red-200 font-poppins text-sm" />
         </div>
-        <div class="mb-3">
-            <label for="description" class="form-label">Description</label>
-            <textarea class="form-control" id="description" name="description">{{ old('description') }}</textarea>
+
+        <!-- Champ Description -->
+        <div class="w-[745px]">
+
+            <textarea id="description" name="description" class="w-full h-[110px] px-4 py-2 rounded-[57px] bg-[#D9D9D9] opacity-100 text-gray-700 font-semibold font-poppins border-none focus:outline-none resize-none placeholder:text-xl" placeholder="Description:">{{ old('description') }}</textarea>
+            <x-input-error :messages="$errors->get('description')" class="mt-1 text-red-200 font-poppins text-sm " />
         </div>
-        <div class="mb-3">
-            <label for="start_date" class="form-label">Date de début (jj/mm/aaaa --:-- --)</label>
-            <input type="datetime-local" class="form-control" id="start_date" name="start_date" value="{{ \Carbon\Carbon::parse($date)->format('Y-m-d\TH:i') }}" readonly required>
+
+        <!-- Champ Date de début -->
+        <div class="w-[745px]">
+
+            <input type="datetime-local" id="start_date" name="start_date" value="{{ \Carbon\Carbon::parse($date)->format('Y-m-d\TH:i') }}" readonly required
+                   class="w-full h-[68px] px-4 rounded-[57px] bg-[#D9D9D9] opacity-100 text-gray-700 font-semibold font-poppins border-none focus:outline-none placeholder:text-xl">
+            <x-input-error :messages="$errors->get('start_date')" class="mt-1 text-red-200 font-poppins text-sm" />
         </div>
-        <div class="mb-3">
-            <label for="deadline" class="form-label">Date de fin (jj/mm/aaaa --:-- --)</label>
-            <input type="datetime-local" class="form-control" id="deadline" name="deadline" value="{{ old('deadline') }}" required>
+
+        <!-- Champ Date de fin -->
+        <div class="w-[745px]">
+            <input type="datetime-local" id="deadline" name="deadline" value="{{ old('deadline') }}" required
+                   class="w-full h-[68px] px-4 rounded-[57px] bg-[#D9D9D9] opacity-100 text-gray-700 font-semibold font-poppins border-none focus:outline-none placeholder:text-xl"
+                   placeholder="End Date:">
+            <x-input-error :messages="$errors->get('deadline')" class="mt-1 text-red-200 font-poppins text-sm" />
         </div>
-        <button type="submit" class="btn btn-primary">Ajouter la Tâche</button>
+
+        <div class="flex space-x-4">
+            <a href="{{ route('calendars.index') }}"
+               class="h-[68px] w-[225px] rounded-[57px] bg-[#D9D9D9] opacity-100 text-black font-black text-[24px] font-inter hover:bg-[#319FBB] transition duration-200 flex items-center justify-center">
+                Back
+            </a>
+            <!-- Bouton Ajouter la Tâche -->
+            <button type="submit"
+                    class="h-[68px] w-[225px] rounded-[57px] bg-[#D9D9D9] opacity-100 text-black font-black text-[24px] font-inter hover:bg-[#319FBB] transition duration-200">
+                    Create Task
+            </button>
+        </div>
     </form>
+
+
 </div>
 @endsection

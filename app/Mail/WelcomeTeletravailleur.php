@@ -60,6 +60,8 @@ class WelcomeTeletravailleur extends Mailable implements ShouldQueue
      */
     public function attachments(): array
     {
-        return [];
+        return [\Illuminate\Mail\Mailables\Attachment::fromPath(public_path('images/logo2.png'))
+        ->as('logo2.png')
+        ->withMime('image/png'),];
     }
 }
