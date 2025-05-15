@@ -33,7 +33,7 @@ class Chatbot extends Model
         $faqs = [
             ['question' => 'How many vacation days do I have per year?', 'answer' => 'You are entitled to 30 vacation days per year.'],
             ['question' => 'How do I request a leave?', 'answer' => 'You can request a vacation through the online HR portal.'],
-            ['question' => 'Who should I contact for HR-related questions?', 'answer' => 'Please contact the HR department at hr@societe.com.'],
+            ['question' => 'Who should I contact for HR-related questions?', 'answer' => 'Please contact the HR department at Contact@waydev.com.'],
         ];
 
         $question = strtolower(trim($question));
