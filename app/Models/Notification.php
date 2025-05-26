@@ -24,12 +24,11 @@ class Notification extends Model
 
     public function envoyerSMS()
     {
-        // Méthode personnalisée (à implémenter selon tes besoins, par exemple, utiliser une API SMS)
-        // Exemple fictif :
+
+
         $teletravailleur = $this->teletravailleur;
         if ($teletravailleur && $teletravailleur->telephone) {
-            // Logique pour envoyer un SMS avec $this->contenu au $teletravailleur->telephone
-            // (intégrer une bibliothèque comme Twilio ou Nexmo)
+
             $this->read_at = now();
             $this->save();
         }

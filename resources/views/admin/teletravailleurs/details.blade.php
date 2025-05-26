@@ -1,9 +1,9 @@
 @extends('layouts.base-interface')
 
 @section('content')
-<!-- Conteneur principal pour gérer le positionnement -->
+
 <div style="position: relative; width: 100%; min-height: 100vh; overflow: visible;">
-    <!-- Section admin ancrée à gauche -->
+
     <div style="position: absolute; left: -210px; top: 60px; z-index: 10;">
         <div class="p-3" style="background: rgba(0, 0, 0, 0.5); border-radius: 77px; width: 574px; height: 220px; position: relative; border: 0.5px solid rgb(113, 113, 113); backdrop-filter: blur(10px);">
             <div class="d-flex align-items-center mb-2">
@@ -22,7 +22,7 @@
         </div>
     </div>
 
-    <!-- Boutons -->
+
     <div id="button-container" style="position: absolute; left: 10px; top: 300px; z-index: 10; display: flex; flex-direction: column; gap: 10px;" class="button-container">
         <a href="{{ route('admin.teletravailleurs.index') }}" class="btn btn-primary rounded-pill px-4 py-2" style="display: flex; align-items: center; justify-content: center; backdrop-filter: blur(10px);">
             <img src="{{ asset('images/profile.png') }}" alt="Profile Icon" style="width: 51px; height: 36px; margin-right: 40px; margin-left: 60px;">
@@ -46,7 +46,7 @@
     </div>
 
 
-    <!-- Conteneur pour les détails du télétravailleur -->
+
     <div style="margin-left: 360px; min-height: calc(100vh - 40px); padding: 20px 0 20px 20px; max-width: none; width: calc(100% - 300px);">
         <div class="container-fluid" style="color: white; padding-right: 0; margin-right: 0;">
             @if (session('error'))
@@ -55,9 +55,9 @@
                 </div>
             @endif
 
-            <!-- Une seule carte pour toutes les sections avec défilement -->
+
             <div class="card" style="background: rgba(0, 0, 0, 0.5); border-radius: 77px; padding: 15px; border: 1px solid #444; width: 1060px; height: 579px; overflow-y: auto; position: relative; padding-right: 10px; backdrop-filter: blur(10px); scrollbar-width: none; -ms-overflow-style: none; margin-top: 45px;">
-                <!-- Section avec photo, nom, prénom, email, statut et numéro de téléphone -->
+
                 <div class="section-content">
                     <div class="d-flex justify-content-between align-items-center">
                         <div class="d-flex align-items-center position-relative">
@@ -77,17 +77,17 @@
                     </div>
                 </div>
 
-                <!-- Ligne de séparation -->
+
                 <hr class="section-divider">
 
-                <!-- Section Suivi des Heures -->
+
                 <div class="section-content">
                     <h4 style="font-weight: bold; font-size:25px; margin-left: 20px;  ">Hours Tracked </h4>
 
                     @php
     $teletravailleurId = isset($teletravailleur->teletravailleur) ? $teletravailleur->teletravailleur->id : null;
     if ($teletravailleurId) {
-        // Calculer le total du jour
+
         $todaySeconds = 0;
         $todaySessions = \App\Models\WorkingHour::where('teletravailleur_id', $teletravailleurId)
             ->where('date', now()->toDateString())
@@ -103,7 +103,7 @@
         $seconds = $remainingSeconds % 60;
         $todayFormatted = "{$hours}h {$minutes}m {$seconds}s";
 
-        // Calculer le total mensuel
+
         $selectedMonth = request()->input('month', now()->format('Y-m'));
         $startOfMonth = \Carbon\Carbon::createFromFormat('Y-m', $selectedMonth)->startOfMonth();
         $endOfMonth = \Carbon\Carbon::createFromFormat('Y-m', $selectedMonth)->endOfMonth();
@@ -133,10 +133,10 @@
 
                 </div>
 
-                <!-- Ligne de séparation -->
+
                 <hr class="section-divider">
 
-                <!-- Section Historique des Captures d'Écran -->
+
                 <div class="section-content">
                     <h4 style="font-weight: bold; font-size: 25px; margin-left: 20px;">Screenshots History</h4>
                     <br>
@@ -146,7 +146,7 @@
                         <p style="color: #A19B9B; font-weight: bold; text-align: center;font-size: 18px;">Actions</p>
                     </div>
 
-                    <!-- Ligne de séparation -->
+
                     <hr class="section-divider">
 
                     @if($screenshots->isEmpty())
@@ -165,20 +165,20 @@
                             </div>
                         @endforeach
                         <div style="display: grid; grid-template-columns: 1fr 2fr 1fr; gap: 20px; padding: 10px 20px; margin-top: 20px;">
-                            <div></div> <!-- Espace vide sous "Date" -->
-                            <div></div> <!-- Espace vide sous "Screenshots" -->
+                            <div></div>
+                            <div></div>
                             <div style="text-align: center; " >
-                                {{ $screenshots->links() }} <!-- Pagination -->
+                                {{ $screenshots->links() }}
                             </div>
                         </div>
 
                     @endif
                 </div>
 
-                <!-- Ligne de séparation -->
+
                 <hr class="section-divider">
 
-                <!-- Section Historique des Heures -->
+
 <div class="section-content">
     <h4 style="font-weight: bold; font-size: 25px; margin-left: 20px;">Hours History</h4>
     <br>
@@ -189,7 +189,7 @@
         <p style="color: #A19B9B; font-weight: bold; text-align: center;font-size: 18px;">Total Hours</p>
     </div>
 
-    <!-- Ligne de séparation -->
+
     <hr class="section-divider">
 
     @if($workingHours->isEmpty())
@@ -220,15 +220,15 @@
             <div></div>
             <div></div>
             <div style="text-align: center;">
-                {{ $workingHours->links() }} <!-- Pagination -->
+                {{ $workingHours->links() }}
             </div>
         </div>
     @endif
 </div>
-                <!-- Ligne de séparation -->
+
                 <hr class="section-divider">
 
-                <!-- Section Statistiques Mensuelles -->
+
                 <div class="section-content">
                     <h4 style="font-weight: bold; font-size: 25px; margin-left: 20px;">Monthly Statistics</h4>
                     <br>

@@ -23,10 +23,10 @@
         <form method="POST" action="{{ route('teletravailleur.change.password', $token) }}">
             @csrf
 
-             <!-- Faux champ invisible pour tromper l'autocomplétion -->
+
              <input type="password" style="display: none;" autocomplete="off">
 
-            <!-- Old Password -->
+
             <div class="mb-4 text-center">
                 <x-text-input
                     style="border-radius: 57px;"
@@ -43,7 +43,7 @@
                 @enderror
             </div>
 
-            <!-- New Password -->
+
             <div class="mb-4 text-center">
                 <x-text-input
                     style="border-radius: 57px;"
@@ -59,7 +59,7 @@
                 @enderror
             </div>
 
-            <!-- Confirm Password -->
+
             <div class="mb-4 text-center">
                 <x-text-input
                     style="border-radius: 57px;"
@@ -73,7 +73,7 @@
             </div>
 
             <br>
-            <!-- Bouton Next -->
+
             <div class="flex justify-center mt-4">
                 <button
                     type="submit"
@@ -84,7 +84,7 @@
             </div>
         </form>
         <br><br><br><br><br>
-        <!-- 3 points sous la carte -->
+
         <div class="flex justify-center mt-6 space-x-2">
             <div class="w-4 h-4 bg-[#D9D9D9] rounded-full"></div>
             <div class="w-4 h-4 bg-[#D9D9D9] rounded-full opacity-50"></div>
@@ -92,7 +92,7 @@
         </div>
     </div>
 
-     <!-- Script JavaScript pour vider le champ au chargement -->
+
      <script>
         window.onload = function() {
             const oldPasswordField = document.getElementById('old_password');

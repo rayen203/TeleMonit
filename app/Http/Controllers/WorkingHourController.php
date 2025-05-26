@@ -13,9 +13,8 @@ use Illuminate\Support\Facades\Mail;
 
 class WorkingHourController extends Controller
 {
-    /**
-     * Démarrer une session de travail pour le télétravailleur connecté.
-     */
+
+
     public function start(Request $request)
     {
         try {
@@ -92,9 +91,8 @@ class WorkingHourController extends Controller
         }
     }
 
-    /**
-     * Mettre en pause une session de travail.
-     */
+
+
     public function pause(Request $request)
     {
         $teletravailleur = Auth::user()->teletravailleur;
@@ -134,6 +132,7 @@ class WorkingHourController extends Controller
             return response()->json(['error' => 'La session est déjà en pause.'], 400);
         }
 
+        $workingHour->resume_time = null;
         $workingHour->pause_time = now();
         $workingHour->save();
 
@@ -146,9 +145,8 @@ class WorkingHourController extends Controller
         return response()->json(['message' => 'Travail mis en pause.', 'pause_time' => $workingHour->pause_time]);
     }
 
-    /**
-     * Reprendre une session de travail après une pause.
-     */
+
+
     public function resume(Request $request)
     {
         try {
@@ -225,56 +223,49 @@ class WorkingHourController extends Controller
         }
     }
 
-    /**
-     * Arrêter une session de travail.
-     */
-    public function stop(Request $request)
-    {
-        $teletravailleur = Auth::user()->teletravailleur;
-        if (!$teletravailleur) {
-            \Log::error('Télétravailleur non trouvé lors de l\'arrêt.', ['user_id' => Auth::id()]);
-            return response()->json(['error' => 'Télétravailleur non trouvé.'], 404);
-        }
 
-        $workingHour = WorkingHour::where('teletravailleur_id', $teletravailleur->id)
-            ->where('date', now()->toDateString())
-            ->whereNull('stop_time')
-            ->first();
 
-        if (!$workingHour) {
-            \Log::error('Aucune session active trouvée pour l\'arrêt.', [
-                'teletravailleur_id' => $teletravailleur->id,
-                'date' => now()->toDateString(),
-            ]);
-            return response()->json(['error' => 'Aucune session active.'], 400);
-        }
-
-        $effectiveSeconds = $request->input('total_seconds', 0);
-        if ($effectiveSeconds < 0) {
-            $effectiveSeconds = 0;
-            \Log::warning('total_seconds négatif reçu, corrigé à 0.', ['received' => $request->input('total_seconds')]);
-        }
-
-        $workingHour->stop_time = now();
-        $workingHour->total_seconds = $effectiveSeconds;
-        $workingHour->pause_total_seconds = min($workingHour->pause_total_seconds ?? 0, $effectiveSeconds);
-        $workingHour->save();
-
-        \Log::info('Session arrêtée avec succès.', [
-            'teletravailleur_id' => $teletravailleur->id,
-            'working_hour_id' => $workingHour->id,
-            'total_seconds' => $workingHour->total_seconds,
-            'pause_total_seconds' => $workingHour->pause_total_seconds,
-        ]);
-
-        $this->checkDailyHours($teletravailleur->id, $workingHour->date);
-
-        return response()->json(['message' => 'Session arrêtée.']);
+   public function stop(Request $request)
+{
+    $teletravailleur = Auth::user()->teletravailleur;
+    if (!$teletravailleur) {
+        \Log::error('Télétravailleur non trouvé lors de l\'arrêt.', ['user_id' => Auth::id()]);
+        return response()->json(['error' => 'Télétravailleur non trouvé.'], 404);
     }
 
-    /**
-     * Vérifier les heures totales de la journée et envoyer des notifications si nécessaire.
-     */
+    // Optimisation : Utiliser une seule requête avec select pour réduire la charge
+    $workingHour = WorkingHour::where('teletravailleur_id', $teletravailleur->id)
+        ->where('date', now()->toDateString())
+        ->whereNull('stop_time')
+        ->select('id', 'teletravailleur_id', 'date', 'start_time', 'pause_time', 'resume_time', 'stop_time', 'total_seconds', 'pause_total_seconds')
+        ->first();
+
+    if (!$workingHour) {
+        \Log::error('Aucune session active trouvée pour l\'arrêt.', ['teletravailleur_id' => $teletravailleur->id]);
+        return response()->json(['error' => 'Aucune session active.'], 400);
+    }
+
+    // Vérifier et mettre à jour pause_total_seconds si une pause est en cours
+    if ($workingHour->pause_time && !$workingHour->resume_time) {
+        $timePaused = now()->diffInSeconds($workingHour->pause_time);
+        $workingHour->pause_total_seconds += $timePaused;
+        \Log::info('Pause en cours finalisée.', ['working_hour_id' => $workingHour->id, 'time_paused' => $timePaused]);
+    }
+
+    // Définir stop_time et calculer total_seconds
+    $workingHour->stop_time = now();
+    $effectiveSeconds = $workingHour->calculateTotalSeconds();
+    $workingHour->total_seconds = max(0, $effectiveSeconds);
+    $workingHour->pause_total_seconds = min($workingHour->pause_total_seconds ?? 0, $effectiveSeconds);
+    $workingHour->save();
+
+    \Log::info('Session arrêtée.', ['working_hour_id' => $workingHour->id, 'total_seconds' => $workingHour->total_seconds]);
+
+    $this->checkDailyHours($teletravailleur->id, $workingHour->date);
+
+    return response()->json(['message' => 'Session arrêtée.']);
+}
+
     protected function checkDailyHours($teletravailleurId, $date)
     {
         \Log::info('Début de la vérification des heures quotidiennes.', [

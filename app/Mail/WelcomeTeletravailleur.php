@@ -18,9 +18,7 @@ class WelcomeTeletravailleur extends Mailable implements ShouldQueue
     public $password;
     public $completionLink;
 
-    /**
-     * Create a new message instance.
-     */
+
     public function __construct(Utilisateur $user, string $password, string $completionLink)
     {
         $this->user = $user;
@@ -28,9 +26,7 @@ class WelcomeTeletravailleur extends Mailable implements ShouldQueue
         $this->completionLink = $completionLink;
     }
 
-    /**
-     * Get the message envelope.
-     */
+
     public function envelope(): Envelope
     {
         return new Envelope(
@@ -38,9 +34,7 @@ class WelcomeTeletravailleur extends Mailable implements ShouldQueue
         );
     }
 
-    /**
-     * Get the message content definition.
-     */
+
     public function content(): Content
     {
         return new Content(

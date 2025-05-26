@@ -1,4 +1,4 @@
-<!-- resources/views/teletravailleur/complete_profile.blade.php -->
+
 @extends('layouts.app')
 
 @section('content')
@@ -12,7 +12,7 @@
     <form method="POST" action="{{ route('teletravailleur.update_profile') }}" enctype="multipart/form-data">
         @csrf
 
-        <!-- Exemple de champ de profil -->
+
         <div class="mb-3">
             <label for="adresse" class="form-label">Adresse</label>
             <input type="text" class="form-control" id="adresse" name="adresse" value="{{ old('adresse', $teletravailleur->adresse) }}">

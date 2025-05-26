@@ -66,7 +66,7 @@ class WorkingHour extends Model
     {
         $effectiveSeconds = $this->total_seconds - ($this->pause_total_seconds ?? 0);
 
-        // Si le temps effectif est négatif, loguer le problème et utiliser total_seconds
+
         if ($effectiveSeconds < 0) {
             \Log::warning('Temps effectif négatif détecté', [
                 'working_hour_id' => $this->id,
@@ -74,7 +74,7 @@ class WorkingHour extends Model
                 'pause_total_seconds' => $this->pause_total_seconds,
                 'effectiveSeconds' => $effectiveSeconds,
             ]);
-            $effectiveSeconds = $this->total_seconds; // Utiliser total_seconds brut
+            $effectiveSeconds = $this->total_seconds;
         }
 
         if ($effectiveSeconds >= 3600) {

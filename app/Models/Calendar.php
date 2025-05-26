@@ -32,7 +32,7 @@ class Calendar extends Model
     {
         $tacheList = $this->tacheList ?? [];
 
-        // Générer un ID unique pour la tâche
+
         $newId = count($tacheList) + 1;
 
         $tacheList[] = [
@@ -48,9 +48,7 @@ class Calendar extends Model
         $this->save();
     }
 
-    /**
-     * Modifier une tâche existante
-     */
+
     public function modifierTache($tacheId, $title, $description, $startDate, $deadline, $status)
     {
         $tacheList = $this->tacheList ?? [];
@@ -70,9 +68,7 @@ class Calendar extends Model
         $this->save();
     }
 
-    /**
-     * Supprimer une tâche
-     */
+
     public function supprimerTache($tacheId)
     {
         $tacheList = $this->tacheList ?? [];
@@ -91,12 +87,10 @@ class Calendar extends Model
         $this->save();
     }
 
-    /**
-     * Calculer les heures travaillées pour une tâche spécifique
-     */
+
     public function getWorkedHoursForTache($tache)
     {
-        // Vérifier si l'utilisateur est un télétravailleur
+
         $workingHours = $this->utilisateur->teletravailleur
             ? $this->utilisateur->teletravailleur->workingHours()
                 ->whereBetween('start_time', [$tache['start_date'], $tache['deadline']])
@@ -114,9 +108,7 @@ class Calendar extends Model
         return "{$hours}h {$minutes}m {$seconds}s";
     }
 
-    /**
-     * Vérifier si une tâche est en retard
-     */
+
     public function isTacheOverdue($tache)
     {
         return now()->greaterThan($tache['deadline']) && $tache['status'] !== 'completed';

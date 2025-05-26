@@ -38,7 +38,7 @@ class CustomResetPasswordNotification extends Notification
                     ->attach(public_path('images/logo2.png'), [
                         'as' => 'logo2.png',
                         'mime' => 'image/png',
-                        'cid' => 'logo2.png', // Correspond à cid:logo2.png dans l'email
+                        'cid' => 'logo2.png',
                     ]);
     }
 }

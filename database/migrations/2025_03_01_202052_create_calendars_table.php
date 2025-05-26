@@ -6,25 +6,23 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
+
+
     public function up(): void
     {
         Schema::create('calendars', function (Blueprint $table) {
-            $table->id(); // id: int [PK]
+            $table->id();
             $table->date('date');
-            $table->json('tacheList'); // tacheList: JSON
+            $table->json('tacheList');
             $table->unsignedBigInteger('user_id');
             $table->foreign('user_id')->references('id')->on('utilisateurs')->onDelete('cascade');
-            $table->unique(['user_id', 'date']); // Clé composite unique
+            $table->unique(['user_id', 'date']);
             $table->timestamps();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
+
+
     public function down(): void
     {
         Schema::dropIfExists('calendars');

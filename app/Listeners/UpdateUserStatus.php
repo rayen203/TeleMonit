@@ -11,15 +11,13 @@ use App\Models\Utilisateur;
 
 class UpdateUserStatus
 {
-    /**
-     * Lorsqu'un utilisateur se connecte, on met à jour son statut et son activité.
-     */
+
     public function handleLogin(Login $event)
     {
         $user = $event->user;
         if ($user && $user instanceof Utilisateur) {
             try {
-                $user->statut = true; // Actif
+                $user->statut = true;
                 $user->save();
             } catch (\Exception $e) {
                 Log::error('Erreur lors de la mise à jour du statut (Login) pour l\'utilisateur ' . $user->id . ' : ' . $e->getMessage());
@@ -27,17 +25,15 @@ class UpdateUserStatus
         }
     }
 
-    /**
-     * Lorsqu'un utilisateur se déconnecte, on met à jour son statut.
-     */
+
     public function handleLogout(Logout $event)
     {
         $user = $event->user;
         if ($user && $user instanceof Utilisateur) {
             try {
-                $user->statut = false; // Inactif
+                $user->statut = false;
                 $user->save();
-                // Supprimer la clé de cache lors de la déconnexion
+
                 Cache::forget('user-is-online-' . $user->id);
             } catch (\Exception $e) {
                 Log::error('Erreur lors de la mise à jour du statut (Logout) pour l\'utilisateur ' . $user->id . ' : ' . $e->getMessage());
@@ -45,9 +41,7 @@ class UpdateUserStatus
         }
     }
 
-    /**
-     * Met à jour le statut de tous les utilisateurs en fonction de isOnline().
-     */
+
     public function updateAllUserStatuses()
     {
         try {

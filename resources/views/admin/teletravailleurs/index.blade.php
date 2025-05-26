@@ -15,7 +15,7 @@
     @else
 
 
-        <!-- En-têtes -->
+
         <div class="d-flex justify-content-start align-items-center mb-3" style="padding: 10px 0; gap: 10px; height: 94px; display: flex; flex-direction: row; margin-top: -17px;">
             <div class="btn btn-primary rounded-pill px-4 py-2" style="background: rgba(0, 0, 0, 0.5); border: 1px solid #444; color: #E1E4E6; font-weight: bold; font-size: 20px; border-radius: 77px; display: flex; align-items: center; justify-content: center; text-align: center; backdrop-filter: blur(10px);">Name & Surname</div>
             <div class="btn btn-primary rounded-pill px-4 py-2" style="background: rgba(0, 0, 0, 0.5); border: 1px solid #444; color: #E1E4E6; font-weight: bold; font-size: 20px; border-radius: 77px; width: 290px; display: flex; align-items: center; justify-content: center; text-align: center; backdrop-filter: blur(10px);">Total Hours/Day</div>
@@ -23,7 +23,7 @@
             <div class="btn btn-primary rounded-pill px-4 py-2" style="background: rgba(0, 0, 0, 0.5); border: 1px solid #444; color: #E1E4E6; font-weight: bold; font-size: 20px; border-radius: 77px; width: 236px; display: flex; align-items: center; justify-content: center; text-align: center; backdrop-filter: blur(10px);">Details & Actions</div>
         </div>
 
-        <!-- Grille des cartes -->
+
         <div style="display: flex; flex-direction: column; gap: 20px; max-width: 100%; height: 360px; overflow-y: auto; position: relative; padding-right: 10px;">
             @foreach ($teletravailleurs as $teletravailleur)
                 @php
@@ -58,24 +58,24 @@
                     $displayTime = $hours > 0 ? ($minutes > 0 ? "{$hours}H{$minutes}min" : "{$hours}H") : ($minutes > 0 ? "{$minutes}min" : "0H");
                 @endphp
                 <div style="background: rgba(0, 0, 0, 0.5); border-radius: 77px; padding: 15px; display: flex; flex-direction: row; align-items: center; border: 1px solid #444; height: 80px; width: 1060px; justify-content: space-between; gap: 10px; backdrop-filter: blur(10px);">
-                    <!-- Name & Surname -->
+
                     <div style="display: flex; align-items: center; flex: 1; margin-left: 5px; margin-right: 10px; font-weight: bold;">
                         <img src="{{ $teletravailleur->photoProfil ? (Str::startsWith($teletravailleur->photoProfil, 'images/') ? asset($teletravailleur->photoProfil) : asset('storage/' . $teletravailleur->photoProfil)) : asset('images/default-profile.png') }}" alt="Profile Photo" class="rounded-circle mr-2" style="width: 46px; height: 44px; border-radius: 77px;" onerror="this.src='{{ asset('images/default-profile.png') }}';">
                         <span style="color: #E1E4E6; font-size: 16px; font-family: 'Inter', sans-serif;">{{ $teletravailleur->utilisateur?->nom ?? 'N/A' }} {{ $teletravailleur->utilisateur?->prenom ?? '' }}</span>
                     </div>
 
-                    <!-- Total Hours/Day -->
+
                     <div style="flex: 1; text-align: center; margin-left: 20px; margin-right: 120px;">
                         <span style="color: #E1E4E6; font-size: 18px; font-family: 'Inter', sans-serif; font-weight: bold;">{{ $displayTime }}</span>
                     </div>
 
-                    <!-- Statut -->
+
                     <div style="display: flex; align-items: center; justify-content: center; margin-left: 50px; margin-right: 125px;">
                         <div class="bg-{{ $teletravailleur->utilisateur?->isOnline() ? 'green' : 'red' }}-500 rounded-full w-4 h-4 mr-2" style="display: inline-block; vertical-align: middle;"></div>
                         <span class="text-xl font-bold font-['Inter'] {{ $teletravailleur->utilisateur?->isOnline() ? 'text-green-500' : 'text-red-500' }}" style="display: inline-block; vertical-align: middle; font-size: 16px;">{{ $teletravailleur->utilisateur?->isOnline() ? 'Connected' : 'Disconnected' }}</span>
                     </div>
 
-                    <!-- Details & Actions -->
+
                     <div style="display: flex; align-items: center; justify-content: flex-end; margin-left: 30px; margin-right: 90px;">
                         <a href="{{ route('admin.teletravailleur.details', $teletravailleur->utilisateur->id) }}" style="color: #E1E4E6; font-size: 16px; font-family: 'Inter', sans-serif; text-decoration: none; margin-right: 10px;">
                             <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -96,7 +96,7 @@
         </div>
     @endif
 
-    <!-- Script pour mise à jour des statuts avec gestion des erreurs -->
+
     <script>
         function updateStatus() {
             fetch('/admin/teletravailleurs/status')

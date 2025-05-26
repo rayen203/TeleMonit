@@ -12,7 +12,7 @@ class TeletravailleurMiddleware
 {
     public function handle(Request $request, Closure $next): Response
     {
-        if (!Auth::check()) { // Utilise le guard par défaut (web)
+        if (!Auth::check()) {
             Log::info('Utilisateur non authentifié', ['url' => $request->url()]);
             return redirect()->route('login')->with('error', 'Veuillez vous connecter.');
         }

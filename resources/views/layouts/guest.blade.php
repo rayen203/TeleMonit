@@ -14,7 +14,7 @@
 
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
-        <link href="https://fonts.cdnfonts.com/css/jersey-25" rel="stylesheet">
+
     </head>
     <body style="margin: 0; font-family: 'Poppins', sans-serif;">
         {{ $slot }}

@@ -1,33 +1,33 @@
-<!-- resources/views/calendars/index.blade.php -->
+
 @extends('layouts.base-interface')
 
 @section('content')
 
 <div class="d-flex justify-content-center min-vh-100" style="padding: 20px;">
-    <!-- Section Gauche (Détails Utilisateur) -->
+
     <br>
     <div style="width: 574px; margin-right: 1300px;">
-        <!-- Détails Utilisateur -->
+
         <div class="p-3" style="background: rgba(0, 0, 0, 0.5); border-radius: 77px; width: 574px; height: 220px; position: relative; border: 0.5px solid rgb(113, 113, 113); backdrop-filter: blur(10px); box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);">
             <div class="d-flex align-items-center mb-2">
                 <div style="position: relative;">
-                    <!-- Photo de profil -->
+
                     @if(auth()->user()->teletravailleur)
                         <img src="{{ auth()->user()->teletravailleur && auth()->user()->teletravailleur->photoProfil ? (Str::startsWith(auth()->user()->teletravailleur->photoProfil, 'images/') ? asset(auth()->user()->teletravailleur->photoProfil) : asset('storage/' . auth()->user()->teletravailleur->photoProfil)) : asset('images/default-profile.png') }}" alt="Profile Photo" class="rounded-circle me-3" style="width: 127px; height: 122px; margin-left: 190px; border-radius: 77px;" onerror="this.src='{{ asset('images/default-profile.png') }}';">
                     @else
                         <img src="{{ auth()->user()->photoProfil ? asset('storage/' . auth()->user()->photoProfil) : asset('images/avatar1.png') }}" alt="Profile Photo" class="rounded-circle me-3" style="width: 127px; height: 122px; margin-left: 190px;" onerror="this.src='{{ asset('images/avatar1.png') }}';">
                     @endif
-                    <!-- Bouton d'édition -->
+
                     <a href="{{ route('profile.edit') }}" style="position: absolute; margin-top: -120px; margin-left: 290px;">
                         <img src="{{ asset('images/edit.png') }}" alt="Edit Icon" style="width: 29px; height: 29px;">
                     </a>
                 </div>
-                <!-- Nom -->
+
                 <h5 class="mb-0" style="color: #E1E4E6; margin-left: 350px; margin-top: -70px; font-weight: bold; font-size: 23px;">{{ auth()->user()->nom ?? 'Utilisateur' }} {{ auth()->user()->prenom ?? '' }}</h5>
                 <div>
-                    <!-- Email -->
+
                     <p class="mb-0" style="color: #FFFFFF; width: 180px; height: 19px; margin-left: 195px; margin-top: 60px; text-decoration: underline; font-weight: bold;">{{ auth()->user()->email ?? 'mail@gmail.com' }}</p>
-                    <!-- Téléphone -->
+
                     @if(auth()->user()->teletravailleur)
                         <p class="mb-0" style="color: #FFFFFF; width: 180px; height: 19px; margin-left: 425px; margin-top: -17px; font-weight: bold;">+216 {{ auth()->user()->teletravailleur->telephone ?? 'N/A' }}</p>
                     @else
@@ -37,11 +37,11 @@
             </div>
         </div>
 
-        <!-- Boutons -->
+
         <div id="button-container" style="margin-top: 20px; display: flex; flex-direction: column; gap: 10px;" class="button-container">
             @if(!auth()->user()->teletravailleur)
-                <!-- Boutons pour l'administrateur -->
-                <!-- Bouton Profiles (caché par défaut, affiché au survol) -->
+
+
                 <div class="button-wrapper">
                     <a href="#" class="btn btn-primary rounded-pill px-4 py-2 default-button" style="display: flex; align-items: center; justify-content: center; width: 525px; height: 75px; margin-left: 0;">
                         <img src="{{ asset('images/Component.png') }}" alt="Component Icon" style="width: 38px; height: 22px; margin-right: 30px; margin-left: 460px;">
@@ -53,7 +53,7 @@
                 </div>
             @else
 
-                <!-- Bouton ChronoPanel (caché par défaut, affiché au survol) -->
+
                 <div class="button-wrapper">
                     <a href="#" class="btn btn-primary rounded-pill px-4 py-2 default-button" style="display: flex; align-items: center; justify-content: center; width: 525px; height: 75px; margin-left: 0;">
                         <img src="{{ asset('images/Component.png') }}" alt="Component Icon" style="width: 38px; height: 22px; margin-right: 30px; margin-left: 460px;">
@@ -65,7 +65,7 @@
                 </div>
             @endif
 
-            <!-- Bouton Calendar (toujours affiché, sans effet de survol) -->
+
             <a href="{{ route('calendars.index') }}" class="btn btn-primary rounded-pill px-4 py-2" style="display: flex; align-items: center; justify-content: center; width: 525px; height: 75px; backdrop-filter: blur(10px);">
                 <img src="{{ asset('images/calendar.png') }}" alt="Calendar Icon" style="width: 38px; height: 38px; margin-right: 40px; margin-left: 90px;">
                 Calendar
@@ -76,9 +76,9 @@
         </div>
     </div>
 
-   <!-- Section Droite (Calendrier et Tâches) -->
+
     <div class="flex-grow-1"  style="max-width: 1050px;  ;margin-left: 600px; ">
-    <!-- Message de succès -->
+
     @if (session('success'))
         <div class="alert alert-success">
             {{ session('success') }}
@@ -87,9 +87,9 @@
 
 
 
-    <!-- Calendrier -->
+
     <div id="calendar-container" style="background: rgba(0, 0, 0, 0.5); border-radius: 77px; padding: 15px; border: 1px solid #444; width: 100%; height: 570px; overflow-y: auto; position: relative; backdrop-filter: blur(10px); box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3); margin-bottom: 20px;  margin-top: -410px; scrollbar-width: none;">
-        <!-- Navigation par mois -->
+
         @php
             $selectedMonth = request()->input('month', now()->format('Y-m'));
             $currentMonth = \Carbon\Carbon::createFromFormat('Y-m', $selectedMonth)->startOfMonth();
@@ -173,7 +173,7 @@
 </div>
 </div>
 
-<!-- Styles spécifiques -->
+
 <style>
     .alert-success {
         background: rgba(40, 167, 69, 0.5);
@@ -255,7 +255,7 @@
     .task-table a:hover, .task-table button:hover {
         background: rgba(255, 255, 255, 0.1);
     }
-    /* Styles pour les boutons de la section gauche */
+
     .button-container {
         align-items: flex-start;
         padding: 5px;
@@ -301,7 +301,7 @@
     .button-wrapper:hover .hidden-button {
         display: flex !important;
     }
-    /* Ajustement pour le bouton + ADD PROFILE */
+
     .button-wrapper .hidden-button.add-profile {
         width: 114px;
         height: 46px;
@@ -311,11 +311,11 @@
     }
 </style>
 
-<!-- Inclusion de FullCalendar (si non présent dans base-interface) -->
+
 <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
 
-<!-- Script pour FullCalendar -->
+
 <script>
     function scrollToCalendar() {
         var calendarEl = document.getElementById('calendar');
@@ -391,17 +391,17 @@
         const days = document.querySelectorAll('.calendar-day');
         days.forEach(day => {
             day.addEventListener('click', function() {
-                // Réinitialiser la couleur de tous les jours à gris
+
                 days.forEach(d => {
                     const label = d.querySelector('.day-label');
                     if (d.getAttribute('data-date') !== '{{ \Carbon\Carbon::today()->format('Y-m-d') }}') {
                         label.style.color = '#A9A9A9';
                     }
                 });
-                // Mettre le jour cliqué en blanc
+
                 const label = this.querySelector('.day-label');
                 label.style.color = '#FFFFFF';
-                // Si c'est aujourd'hui, conserver la priorité de la couleur rouge
+
                 if (this.getAttribute('data-date') === '{{ \Carbon\Carbon::today()->format('Y-m-d') }}') {
                     label.style.color = '#FF4500';
                 }

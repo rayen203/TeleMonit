@@ -24,7 +24,7 @@
         <form method="POST" action="{{ route('password.email') }}">
             @csrf
 
-            <!-- Email -->
+
             <div class="mb-4 text-center">
                 <x-text-input
                     style="border-radius: 57px;"
@@ -43,16 +43,16 @@
             <br>
             <br>
             <br>
-           <!-- Boutons -->
+
             <div class="flex justify-center mt-4 space-x-4">
-                <!-- Bouton Back -->
+
                 <a
                 href="{{ route('login') }}"
                 class="h-[78px] w-[245px] rounded-[57px] bg-[#D9D9D9] opacity-100 text-black font-black text-[24px] font-inter hover:bg-[#319FBB] transition duration-200 flex items-center justify-center"
             >
                 Back
             </a>
-                <!-- Bouton Envoyer -->
+
                 <button
                     type="submit"
                     class="h-[78px] w-[245px] rounded-[57px] bg-[#D9D9D9] opacity-100 text-black font-black text-[24px] font-inter hover:bg-[#319FBB] transition duration-200"

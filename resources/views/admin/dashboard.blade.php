@@ -2,9 +2,9 @@
 
 @section('content')
 
-<!-- Conteneur principal pour gérer le positionnement -->
+
 <div style="position: relative; width: 100%; min-height: 100vh;overflow: visible;">
- <!-- Section admin ancrée à gauche -->
+
 <div style="position: absolute; left: -210px; top: 60px; z-index: 10;">
     <div class="p-3" style="background: rgba(0, 0, 0, 0.5); border-radius: 77px; width: 574px; height: 220px; position: relative; border: 0.5px solid rgb(113, 113, 113); backdrop-filter: blur(10px);">
         <div class="d-flex align-items-center mb-2">
@@ -24,7 +24,7 @@
     </div>
 </div>
 
-<!--buttons-->
+
 <div id="button-container" style="position: absolute; left: 10px; top: 300px; z-index: 10; display: flex; flex-direction: column; gap: 10px;" class="button-container">
     <a href="{{ route('admin.teletravailleurs.index') }}" class="btn btn-primary rounded-pill px-4 py-2" style="display: flex; align-items: center; justify-content: center; backdrop-filter: blur(10px);">
         <img src="{{ asset('images/profile.png') }}" alt="Profile Icon" style="width: 51px; height: 36px; margin-right: 40px; margin-left: 60px;">
@@ -43,7 +43,7 @@
 </div>
 
 <br><br><br><br>
-    <!-- Conteneur pour les autres éléments, centré ou ajusté -->
+
     <div style="margin-left: 360px; min-height: calc(100vh - 40px); padding: 20px 0 20px 20px; max-width: none; width: calc(100% - 300px);">
         <div class="container-fluid" style="color: white; padding-right: 0; margin-right: 0;">
             @if (session('error'))
@@ -55,12 +55,12 @@
 
 
             <br><br>
-            <!-- Section Profil Admin et Boutons -->
+
            <div style="display: flex; justify-content: flex-end; margin-bottom: 0.5rem; margin-right: 135px; padding-right: 0;  ">
                 <a href="{{ route('admin.teletravailleur.create') }}" class="btn text-zinc-200 rounded-[36.5px] text-[12px] font-black font-['Inter'] tracking-wide" style="width: 114px; height: 46px; background-color: #43D941; display: flex; align-items: center; justify-content: center; transform: translateY(-25px); ">+ ADD PROFILE</a>
             </div>
 
-            <!-- Liste des Télétravailleurs -->
+
             <div class="row">
                 <div class="col-12">
                     @if ($teletravailleurs->isEmpty())
@@ -68,14 +68,14 @@
                     @else
                         <div class="card">
                             <div class="card-body">
-                                <!-- En-têtes -->
+
                                 <div class="d-flex justify-content-start align-items-center mb-3" style="padding: 10px 0; gap: 10px; height: 94px; display: flex; flex-direction: row; margin-top: -17px; ">
                                     <div class="btn btn-primary rounded-pill px-4 py-2" style="background: rgba(0, 0, 0, 0.5); border: 1px solid #444; color: #E1E4E6; font-weight: bold; font-size: 20px; border-radius: 77px;  display: flex; align-items: center; justify-content: center; text-align: center; backdrop-filter: blur(10px);">Name & Surname</div>
                                     <div class="btn btn-primary rounded-pill px-4 py-2" style="background: rgba(0, 0, 0, 0.5); border: 1px solid #444; color: #E1E4E6; font-weight: bold; font-size: 20px; border-radius: 77px; width: 290px; display: flex; align-items: center; justify-content: center; text-align: center; backdrop-filter: blur(10px);">Total Hours/Day</div>
                                     <div class="btn btn-primary rounded-pill px-4 py-2" style="background: rgba(0, 0, 0, 0.5); border: 1px solid #444; color: #E1E4E6; font-weight: bold; font-size: 20px; border-radius: 77px; width: 290px; display: flex; align-items: center; justify-content: center; text-align: center; backdrop-filter: blur(10px);">Statut</div>
                                     <div class="btn btn-primary rounded-pill px-4 py-2" style="background: rgba(0, 0, 0, 0.5); border: 1px solid #444; color: #E1E4E6; font-weight: bold; font-size: 20px; border-radius: 77px; width: 236px; display: flex; align-items: center; justify-content: center; text-align: center; backdrop-filter: blur(10px);">Details & Actions</div>
                                 </div>
-                                <!-- Grille des cartes -->
+
 
                                 <div   style="display: flex; flex-direction: column; gap: 20px; max-width: 100%;height: 280px; overflow-y: auto; position: relative; padding-right: 10px; ">
 
@@ -112,21 +112,21 @@
                                             $minutes = floor(($totalSeconds % 3600) / 60);
                                             $displayTime = $hours > 0 ? ($minutes > 0 ? "{$hours}H{$minutes}min" : "{$hours}H") : ($minutes > 0 ? "{$minutes}min" : "0H");
                                         @endphp
-                                        <!-- Carte individuelle pour chaque télétravailleur -->
+
                                         <div style="background: rgba(0, 0, 0, 0.5); border-radius: 77px; padding: 15px; display: flex; flex-direction: row; align-items: center; border: 1px solid #444; height: 80px; width: 1060px; justify-content: space-between; gap: 10px; backdrop-filter: blur(10px); ">
-                                            <!-- Name & Surname -->
+
                                             <div style="display: flex; align-items: center; flex: 1; margin-left: 5px; margin-right: 10px; font-weight: bold ;">
                                                 <img src="{{ $utilisateur->teletravailleur->photoProfil && strpos($utilisateur->teletravailleur->photoProfil, 'images/') === 0 ? asset($utilisateur->teletravailleur->photoProfil) : ($utilisateur->teletravailleur->photoProfil ? asset('storage/' . $utilisateur->teletravailleur->photoProfil) : asset('images/default-profile.png')) }}" alt="Profile Photo" class="rounded-circle mr-2" style="width: 46px; height: 44px; border-radius: 77px;" onerror="this.src='{{ asset('images/default-profile.png') }}';">
                                                 <span class="text-m font-black font-['Inter'] text-zinc-200">{{ $utilisateur->nom ?? 'N/A' }} {{ $utilisateur->prenom ?? '' }}</span>
                                             </div>
-                                            <!-- Total Hours/Day -->
+
                                             <div class="text-xl font-bold font-['Inter'] text-zinc-200" style="flex: 1; text-align: center; margin-left: 20px; margin-right: 120px; font-weight: inter ;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{ $displayTime }}</div>
-                                            <!-- Statut -->
+
                                             <div class="d-flex align-items-center" style="justify-content: center; margin-left: 50px; margin-right: 125px; font-weight: inter; white-space: nowrap;">
                                                 <div class="bg-{{ $utilisateur->isOnline() ? 'green' : 'red' }}-500 rounded-full w-4 h-4 mr-2" style="display: inline-block; vertical-align: middle;"></div>
                                                 <span class="text-xl font-bold font-['Inter'] {{ $utilisateur->isOnline() ? 'text-green-500' : 'text-red-500' }}" style="display: inline-block; vertical-align: middle;">{{ $utilisateur->isOnline() ? 'Connected ' : 'Disconnected' }}</span>
                                             </div>
-                                            <!-- Details & action-->
+
                                             <div class="d-flex align-items-center" style="justify-content: flex-end; margin-left: 30px; margin-right: 90px; white-space: nowrap;">
                                                 <a href="{{ route('admin.teletravailleur.details', $utilisateur->id) }}" class="text-white" style="display: inline-block; vertical-align: middle; line-height: 20px; margin-right: 10px; margin-top: -8.5px; ">
                                                     <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -163,29 +163,29 @@
     }
 
     .d-flex > .btn {
-    flex-shrink: 0; /* Empêche les boutons de se réduire et de s'empiler */
-    white-space: nowrap; /* Empêche le texte de passer à la ligne */
+    flex-shrink: 0;
+    white-space: nowrap;
     }
     .button-container {
-        align-items: flex-start; /* Alignement à gauche */
+        align-items: flex-start;
 
-        padding: 5px; /* Espacement interne */
-        border-radius: 10px; /* Coins arrondis */
+        padding: 5px;
+        border-radius: 10px;
     }
 
     .button-container a {
-        display: inline-block; /* Assure que les liens se comportent comme des boutons */
-        padding: 10px 20px; /* Taille de padding par défaut */
+        display: inline-block;
+        padding: 10px 20px;
         text-align: center;
 
         text-decoration: none;
-        color: #E1E4E6; /* Couleur du texte inspirée de l'interface */
-        background: rgba(0, 0, 0, 0.5); /* Fond légèrement plus clair que la div */
-        border: 1px solid #444; /* Bordure fine */
-        border-radius: 77px; /* Coins arrondis comme dans l'interface */
-        font-weight: bold; /* Texte en gras */
+        color: #E1E4E6;
+        background: rgba(0, 0, 0, 0.5);
+        border: 1px solid #444;
+        border-radius: 77px;
+        font-weight: bold;
         font-size: 28px;
-        width: 525px; /* Largeur par défaut, à ajuster avec vos specs */
+        width: 525px;
         height: 75px;
         margin-left: -180px;
 
@@ -193,7 +193,7 @@
     }
 
     .hidden-button {
-        display: none; /* Caché par défaut */
+        display: none;
     }
 
     .button-wrapper {

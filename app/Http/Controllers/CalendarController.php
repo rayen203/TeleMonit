@@ -11,9 +11,9 @@ class CalendarController extends Controller
 {
     public function index()
     {
-        // Récupérer l'email de l'utilisateur connecté
+
         $email = auth()->id();
-        // Rechercher l'utilisateur par email
+
         $user = \App\Models\Utilisateur::where('email', $email)->first();
 
         if (!$user) {
@@ -21,7 +21,7 @@ class CalendarController extends Controller
             return redirect()->route('login')->withErrors(['error' => 'Utilisateur non trouvé. Veuillez vous reconnecter.']);
         }
 
-        // Récupérer l'ID de l'utilisateur
+
         $userId = $user->id;
 
         $calendars = Calendar::where('user_id', $userId)->get();
@@ -33,13 +33,13 @@ class CalendarController extends Controller
     }
 
 
-    // Afficher le formulaire pour ajouter une tâche
+
     public function createTask($date)
     {
         return view('calendars.create-task', compact('date'));
     }
 
-    // Ajouter une nouvelle tâche
+
     public function storeTask(Request $request, $date): \Illuminate\Http\RedirectResponse
     {
         \Log::info('Début de storeTask', [
@@ -47,7 +47,7 @@ class CalendarController extends Controller
             'request_data' => $request->all(),
         ]);
 
-        // Récupérer l'email de l'utilisateur connecté et convertir en ID
+
         $email = auth()->id();
         \Log::info('Valeur de auth()->id() dans storeTask', ['email' => $email]);
         $user = \App\Models\Utilisateur::where('email', $email)->first();
@@ -71,28 +71,28 @@ class CalendarController extends Controller
         ]);
 
         try {
-            // Utiliser la date de la route pour déterminer la date du calendrier
+
             $calendarDate = \Carbon\Carbon::parse($date)->toDateString();
 
-            // Débogage : vérifier les données avant firstOrCreate
+
             \Log::info('Avant firstOrCreate', [
                 'user_id' => $userId,
                 'date' => $calendarDate,
             ]);
 
-            // Trouver ou créer le calendrier pour la date de la route
+
             $calendar = Calendar::firstOrCreate(
                 ['user_id' => $userId, 'date' => $calendarDate],
                 ['tacheList' => []]
             );
 
-            // Débogage : vérifier si l'enregistrement a été créé
+
             \Log::info('Après firstOrCreate', [
                 'calendar_id' => $calendar->id,
                 'tacheList' => $calendar->tacheList,
             ]);
 
-            // Ajouter la tâche
+
             $calendar->ajouterTache(
                 $request->title,
                 $request->description,
@@ -101,7 +101,7 @@ class CalendarController extends Controller
                 'pending'
             );
 
-            // Débogage : vérifier la tacheList après ajout
+
             \Log::info('Après ajouterTache', [
                 'calendar_id' => $calendar->id,
                 'tacheList' => $calendar->tacheList,
@@ -114,7 +114,7 @@ class CalendarController extends Controller
         }
     }
 
-    // Afficher le formulaire pour modifier une tâche
+
     public function editTask($date, $taskId)
     {
         $email = auth()->id();
@@ -133,7 +133,7 @@ class CalendarController extends Controller
 
         $userId = $user->id;
 
-        // Formater la date pour correspondre au format dans la base de données
+
         $formattedDate = \Carbon\Carbon::parse($date)->format('Y-m-d');
 
         \Log::info('Recherche du calendrier dans editTask', [
@@ -141,7 +141,7 @@ class CalendarController extends Controller
             'date' => $formattedDate,
         ]);
 
-        // Vérifier les calendriers existants pour cet utilisateur
+
         $allCalendars = Calendar::where('user_id', $userId)->get()->toArray();
         \Log::info('Tous les calendriers pour cet utilisateur', [
             'user_id' => $userId,
@@ -149,7 +149,7 @@ class CalendarController extends Controller
         ]);
 
         try {
-            // Utiliser SQLite pour extraire la date au format Y-m-d
+
             $calendar = Calendar::where('user_id', $userId)
                 ->whereRaw("DATE(date) = ?", [$formattedDate])
                 ->firstOrFail();
@@ -182,7 +182,7 @@ class CalendarController extends Controller
 
         return view('calendars.edit-task', compact('calendar', 'task', 'formattedDate'));
     }
-    // Modifier une tâche existante
+
     public function updateTask(Request $request, $date, $taskId)
     {
         $email = auth()->id();
@@ -201,14 +201,14 @@ class CalendarController extends Controller
 
         $userId = $user->id;
 
-        // Formater la date pour correspondre au format dans la base de données
+
         $formattedDate = \Carbon\Carbon::parse($date)->format('Y-m-d');
         \Log::info('Valeur de date dans updateTask', [
             'date' => $date,
             'formattedDate' => $formattedDate,
         ]);
 
-        // Vérifier les calendriers existants pour cet utilisateur
+
         $allCalendars = Calendar::where('user_id', $userId)->get()->toArray();
         \Log::info('Tous les calendriers pour cet utilisateur dans updateTask', [
             'user_id' => $userId,
@@ -216,7 +216,7 @@ class CalendarController extends Controller
         ]);
 
         try {
-            // Utiliser SQLite pour extraire la date au format Y-m-d
+
             $calendar = Calendar::where('user_id', $userId)
                 ->whereRaw("DATE(date) = ?", [$formattedDate])
                 ->firstOrFail();
@@ -245,14 +245,14 @@ class CalendarController extends Controller
             return redirect()->route('calendars.index')->withErrors(['error' => 'Tâche non trouvée.']);
         }
 
-        // Mettre à jour la tâche
+
         $tasks[$taskIndex] = [
             'id' => (int)$taskId,
             'title' => $request->input('title'),
             'description' => $request->input('description'),
             'start_date' => $request->input('start_date'),
             'deadline' => $request->input('deadline'),
-            'status' => $tasks[$taskIndex]['status'], // Conserver le statut existant
+            'status' => $tasks[$taskIndex]['status'],
         ];
 
         $calendar->tacheList = $tasks->toArray();
@@ -265,7 +265,7 @@ class CalendarController extends Controller
 
         return redirect()->route('calendars.index')->with('success', 'Tâche mise à jour avec succès !');
     }
-    // Supprimer une tâche
+
 
 
 

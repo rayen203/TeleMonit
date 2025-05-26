@@ -19,7 +19,7 @@
     <form method="POST" action="{{ route('calendars.tasks.store', $date) }}" class="flex flex-col items-center space-y-6">
         @csrf
 
-        <!-- Champ Titre -->
+
         <div class="w-[745px]">
 
             <input type="text" id="title" name="title" value="{{ old('title') }}" required
@@ -28,14 +28,14 @@
             <x-input-error :messages="$errors->get('title')" class="mt-1 text-red-200 font-poppins text-sm" />
         </div>
 
-        <!-- Champ Description -->
+
         <div class="w-[745px]">
 
             <textarea id="description" name="description" class="w-full h-[110px] px-4 py-2 rounded-[57px] bg-[#D9D9D9] opacity-100 text-gray-700 font-semibold font-poppins border-none focus:outline-none resize-none placeholder:text-xl" placeholder="Description:">{{ old('description') }}</textarea>
             <x-input-error :messages="$errors->get('description')" class="mt-1 text-red-200 font-poppins text-sm " />
         </div>
 
-        <!-- Champ Date de début -->
+
         <div class="w-[745px]">
 
             <input type="datetime-local" id="start_date" name="start_date" value="{{ \Carbon\Carbon::parse($date)->format('Y-m-d\TH:i') }}" readonly required
@@ -43,7 +43,7 @@
             <x-input-error :messages="$errors->get('start_date')" class="mt-1 text-red-200 font-poppins text-sm" />
         </div>
 
-        <!-- Champ Date de fin -->
+
         <div class="w-[745px]">
             <input type="datetime-local" id="deadline" name="deadline" value="{{ old('deadline') }}" required
                    class="w-full h-[68px] px-4 rounded-[57px] bg-[#D9D9D9] opacity-100 text-gray-700 font-semibold font-poppins border-none focus:outline-none placeholder:text-xl"
@@ -56,7 +56,7 @@
                class="h-[68px] w-[225px] rounded-[57px] bg-[#D9D9D9] opacity-100 text-black font-black text-[24px] font-inter hover:bg-[#319FBB] transition duration-200 flex items-center justify-center">
                 Back
             </a>
-            <!-- Bouton Ajouter la Tâche -->
+
             <button type="submit"
                     class="h-[68px] w-[225px] rounded-[57px] bg-[#D9D9D9] opacity-100 text-black font-black text-[24px] font-inter hover:bg-[#319FBB] transition duration-200">
                     Create Task

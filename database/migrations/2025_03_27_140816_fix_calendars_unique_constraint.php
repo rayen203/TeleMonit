@@ -21,7 +21,7 @@ class FixCalendarsUniqueConstraint extends Migration
                 });
             }
         } else {
-            // Pour les autres bases de données (MySQL, PostgreSQL), ajouter sans vérification
+
             Schema::table('calendars', function (Blueprint $table) {
                 $table->unique(['user_id', 'date']);
             });

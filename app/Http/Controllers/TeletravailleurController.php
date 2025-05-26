@@ -48,14 +48,14 @@ public function dashboard(Request $request)
 
     $utilisateur->updateStatut();
 
-    // Requête directe pour tester
+
     $workingHours = WorkingHour::where('teletravailleur_id', $teletravailleur->id)
         ->whereNotNull('stop_time')
         ->orderBy('date', 'desc')
         ->orderBy('start_time', 'desc')
         ->paginate(10);
 
-    // Vérifier si la page demandée est valide
+
     $currentPage = $request->input('page', 1);
     if ($currentPage > $workingHours->lastPage()) {
         return redirect()->route('teletravailleur.dashboard', ['page' => 1]);
@@ -66,7 +66,7 @@ public function dashboard(Request $request)
         'workingHours' => $workingHours->toArray(),
     ]);
 
-    // Calculer le total des heures travaillées aujourd'hui (en soustrayant les pauses)
+
     $todaySessions = WorkingHour::where('teletravailleur_id', $teletravailleur->id)
         ->where('date', now()->toDateString())
         ->whereNotNull('stop_time')
@@ -83,7 +83,7 @@ public function dashboard(Request $request)
         'sessions' => $todaySessions->toArray(),
     ]);
 
-    // Formater le total aujourd'hui
+
     if ($todaySeconds >= 3600) {
         $hours = floor($todaySeconds / 3600);
         $remainingSeconds = $todaySeconds % 3600;
@@ -107,7 +107,7 @@ public function dashboard(Request $request)
         $todayFormatted = "$todaySeconds seconde" . ($todaySeconds > 1 ? "s" : "");
     }
 
-    // Calculer le total des heures travaillées pour le mois en cours
+
     $monthlySessions = WorkingHour::where('teletravailleur_id', $teletravailleur->id)
         ->whereMonth('date', now()->month)
         ->whereYear('date', now()->year)
@@ -120,7 +120,7 @@ public function dashboard(Request $request)
         $monthlySeconds += max(0, $effectiveSeconds);
     }
 
-    // Formater le total mensuel
+
     if ($monthlySeconds >= 3600) {
         $hours = floor($monthlySeconds / 3600);
         $remainingSeconds = $monthlySeconds % 3600;
@@ -144,8 +144,8 @@ public function dashboard(Request $request)
         $monthlyFormatted = "$monthlySeconds seconde" . ($monthlySeconds > 1 ? "s" : "");
     }
 
-    // Messages de notification basés sur le temps travaillé aujourd'hui
-    $todayHours = $todaySeconds / 3600; // Calculer $todayHours pour la logique de notification
+
+    $todayHours = $todaySeconds / 3600;
     $notification = '';
     if ($todayHours >= 8) {
         $notification = "Félicitations ! Vous avez atteint 8 heures de travail aujourd'hui. Il est temps de prendre un repos bien mérité.";
@@ -273,7 +273,7 @@ public function changePassword(Request $request, $token)
             return redirect()->route('login')->withErrors(['error' => 'Le lien de complétion est invalide ou a déjà été utilisé.']);
         }
 
-        // Cas 1 : avatar prédéfini
+
     if ($request->has('avatar')) {
         $avatarName = $request->input('avatar');
         $path = 'images/' . $avatarName;
@@ -308,7 +308,7 @@ public function changePassword(Request $request, $token)
 
 
 
-        // Cas 2 : importer photo
+
         $validatedData = $request->validate([
             'photoProfil' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
@@ -334,11 +334,11 @@ public function changePassword(Request $request, $token)
                     return redirect()->route('login')->withErrors(['error' => 'Utilisateur associé non trouvé.']);
                 }
 
-                // Redirection explicite vers /login avec un indicateur pour éviter les interférences
+
                 \Log::info('Redirection forcée vers /login', ['token' => $token, 'admin_session' => Auth::guard('admin')->check(), 'teletravailleur_session' => Auth::guard('teletravailleur')->check()]);
                 return redirect()->to('/login')
                     ->with('success', 'Profil complété avec succès ! Veuillez vous connecter.')
-                    ->with('completed', true); // Indicateur pour éviter les redirections supplémentaires
+                    ->with('completed', true);
             } else {
                 \Log::error('Aucun fichier photo fourni', ['teletravailleur_id' => $teletravailleur->id]);
                 return redirect()->back()->withErrors(['photoProfil' => 'Veuillez uploader une photo valide.']);
@@ -432,7 +432,7 @@ public function changePassword(Request $request, $token)
     public function details($id)
     {
         $teletravailleur = Utilisateur::with('teletravailleur')->findOrFail($id);
-        $teletravailleurId = $teletravailleur->teletravailleur->id; // Récupère teletravailleur_id (10 pour user_id 11)
+        $teletravailleurId = $teletravailleur->teletravailleur->id;
 
         $screenshots = Screenshot::where('teletravailleur_id', $teletravailleurId)
             ->orderBy('created_at', 'desc')

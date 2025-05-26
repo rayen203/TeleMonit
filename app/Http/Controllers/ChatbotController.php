@@ -21,10 +21,10 @@ class ChatbotController extends Controller
         $question = $request->input('question');
         $teletravailleurId = auth()->user()->id;
 
-        // Vérifier si un enregistrement Chatbot existe pour ce télétravailleur
+
         $chatbot = Chatbot::where('teletravailleur_id', $teletravailleurId)->first();
 
-        // S'il n'existe pas, en créer un
+
         if (!$chatbot) {
             $chatbot = Chatbot::create([
                 'teletravailleur_id' => $teletravailleurId,
@@ -33,7 +33,7 @@ class ChatbotController extends Controller
             ]);
         }
 
-        // Si aucune question n'est posée, retourner uniquement l'historique sans générer de réponse
+
         if (empty($question) || trim($question) === '') {
             return response()->json([
                 'success' => true,
@@ -42,7 +42,7 @@ class ChatbotController extends Controller
             ]);
         }
 
-        // Obtenir la réponse à la question
+
         $answer = $chatbot->repondreQuestion($question);
 
         return response()->json([
@@ -55,11 +55,11 @@ class ChatbotController extends Controller
     {
         $teletravailleurId = auth()->user()->id;
 
-        // Vérifier si un enregistrement Chatbot existe pour ce télétravailleur
+
         $chatbot = Chatbot::where('teletravailleur_id', $teletravailleurId)->first();
 
         if ($chatbot) {
-            // Vider l'historique
+
             $chatbot->historique = [];
             $chatbot->save();
 

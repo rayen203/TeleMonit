@@ -15,20 +15,16 @@ use Illuminate\View\View;
 
 class NewPasswordController extends Controller
 {
-    /**
-     * Affiche le formulaire de réinitialisation du mot de passe.
-     */
+
     public function create(Request $request): View
     {
         return view('auth.reset-password', ['request' => $request]);
     }
 
-    /**
-     * Gère la soumission du nouveau mot de passe.
-     */
+
     public function store(Request $request): RedirectResponse
     {
-        // Validation des champs
+
         $request->validate([
             'token' => ['required'],
             'email' => ['required', 'email'],
@@ -37,7 +33,7 @@ class NewPasswordController extends Controller
 
         Log::info('Tentative de réinitialisation pour : ' . $request->email);
 
-        // Réinitialisation du mot de passe
+
         $status = Password::reset(
             $request->only('email', 'password', 'password_confirmation', 'token'),
             function ($user) use ($request) {
@@ -56,7 +52,7 @@ class NewPasswordController extends Controller
             Log::info('Réinitialisation réussie pour : ' . $request->email);
             return redirect()->route('login')->with('status', __('Votre mot de passe a été réinitialisé.'));
         } else {
-            // Si l'état de réinitialisation échoue
+
             Log::error('Échec de la réinitialisation pour : ' . $request->email);
             return back()->withInput($request->only('email'))
                 ->withErrors(['email' => __($status)]);

@@ -23,9 +23,5 @@ class Screenshot extends Model
         return $this->belongsTo(Teletravailleur::class, 'teletravailleur_id');
     }
 
-    public function capturer()
-    {
-        // Méthode personnalisée (à implémenter selon tes besoins, par exemple, sauvegarder une image)
 
-    }
 }

@@ -7,14 +7,14 @@ use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\NewPasswordController;
 use App\Http\Controllers\Auth\UpdatePasswordController;
 
-// Redirection racine vers login
+
 Route::redirect('/', '/login')->name('root');
 
 
-// Authentification (gérée par auth.php)
+
 require __DIR__.'/auth.php';
 
-// Routes communes authentifiées
+
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'show'])->name('profile.show');
     Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -29,12 +29,12 @@ Route::middleware('auth')->group(function () {
 
     Route::delete('/calendars/{date}', [CalendarController::class, 'destroy'])->name('calendars.destroy');
 
-    // Dans le groupe middleware('auth')
-Route::get('password/update', [UpdatePasswordController::class, 'show'])->name('password.update');
-Route::post('password/update', [UpdatePasswordController::class, 'update'])->name('password.update');
+
+    Route::get('password/update', [UpdatePasswordController::class, 'show'])->name('password.update');
+    Route::post('password/update', [UpdatePasswordController::class, 'update'])->name('password.update');
 });
 
-// Routes Admin
+
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
 
@@ -48,26 +48,26 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/teletravailleur/{id}/details', [TeletravailleurController::class, 'details'])->name('teletravailleur.details');
 });
 
-// Routes Télétravailleur
+
 Route::middleware(['auth', 'teletravailleur'])->prefix('teletravailleur')->name('teletravailleur.')->group(function () {
     Route::get('/dashboard', [TeletravailleurController::class, 'dashboard'])->name('dashboard');
 
-    // Routes pour gérer les heures de travail
+
     Route::post('/working-hours/start', [WorkingHourController::class, 'start'])->name('working-hours.start');
     Route::post('/working-hours/pause', [WorkingHourController::class, 'pause'])->name('working-hours.pause');
     Route::post('/working-hours/resume', [WorkingHourController::class, 'resume'])->name('working-hours.resume');
     Route::post('/working-hours/stop', [WorkingHourController::class, 'stop'])->name('working-hours.stop');
 
-    // Route pour enregistrer les captures d’écran
+
     Route::post('/screenshots/store', [ScreenshotController::class, 'store'])->name('screenshots.store');
     Route::get('/capture', [ScreenshotController::class, 'capture']);
 
-    Route::get('/chat', [ChatbotController::class, 'showChat'])->name('chat.index'); // Si tu veux garder une page dédiée pour le chat
-    Route::post('/chat/response', [ChatbotController::class, 'getResponse'])->name('chatbot.response'); // Remplace chat.send par chatbot.response
+    Route::get('/chat', [ChatbotController::class, 'showChat'])->name('chat.index');
+    Route::post('/chat/response', [ChatbotController::class, 'getResponse'])->name('chatbot.response');
     Route::post('/teletravailleur/teletravailleur/chat/clear', [ChatbotController::class, 'clearHistory'])->name('teletravailleur.chatbot.clear');
 });
 
-// Routes de complétion du profil
+
 Route::get('/teletravailleur/complete/{token}', [TeletravailleurController::class, 'showChangePasswordForm'])->name('teletravailleur.complete');
 Route::post('/teletravailleur/complete/{token}/password', [TeletravailleurController::class, 'changePassword'])->name('teletravailleur.change.password');
 Route::get('/teletravailleur/complete/{token}/info', [TeletravailleurController::class, 'showCompleteProfileForm'])->name('teletravailleur.complete.info');
@@ -84,14 +84,4 @@ Route::post('reset-password', [NewPasswordController::class, 'store'])->name('pa
 
 
 
-// routes/web.php
-/*Route::get('/phpinfo', function () {
-    phpinfo();
-});
 
-
-
-Route::get('/test-session', function () {
-    session(['test' => 'Session is working']);
-    return session('test');
-});*/

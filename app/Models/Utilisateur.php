@@ -17,7 +17,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Cache;
 use App\Notifications\CustomResetPasswordNotification;
 
-class Utilisateur extends Authenticatable implements CanResetPassword // MustVerifyEmail
+class Utilisateur extends Authenticatable implements CanResetPassword
 {
     use HasFactory, Notifiable;
 
@@ -73,7 +73,7 @@ class Utilisateur extends Authenticatable implements CanResetPassword // MustVer
 
     public function isOnline()
     {
-        $inactivityLimit = now()->subMinutes(10); // 10 minutes d'inactivité maximale
+        $inactivityLimit = now()->subMinutes(10);
         $isOnline = ($this->last_activity && $this->last_activity->gt($inactivityLimit)) ||
                     (Cache::has('user-is-online-' . $this->id) && $this->last_activity && $this->last_activity->gt($inactivityLimit));
         return $isOnline;
@@ -82,8 +82,8 @@ class Utilisateur extends Authenticatable implements CanResetPassword // MustVer
     public function updateStatut()
     {
         if ($this->utilisateur) {
-            $this->utilisateur->last_activity = now(); // Met à jour la dernière activité
-            $this->utilisateur->statut = true; // Met le statut à true (en ligne ou actif)
+            $this->utilisateur->last_activity = now();
+            $this->utilisateur->statut = true;
             $this->utilisateur->save();
         }
     }

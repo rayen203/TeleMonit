@@ -24,10 +24,10 @@ class UpdatePasswordController extends Controller
      */
     public function update(Request $request): RedirectResponse
     {
-        // Valider les champs
+
         $request->validate([
-            'password' => ['required', 'current_password'], // Vérifie que l'ancien mot de passe est correct
-            'new_password' => ['required', Password::defaults(), 'confirmed'], // Vérifie le nouveau mot de passe et sa confirmation
+            'password' => ['required', 'current_password'],
+            'new_password' => ['required', Password::defaults(), 'confirmed'],
 
         ]);
 

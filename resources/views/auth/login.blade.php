@@ -25,7 +25,7 @@
         <form method="POST" action="{{ route('login') }}">
             @csrf
 
-            <!-- Email -->
+
             <div class="mb-4 text-center">
                 <x-text-input
                     style="border-radius: 57px"
@@ -44,7 +44,7 @@
 
             <br>
 
-            <!-- Password -->
+
             <div class="mb-4 text-center">
                 <x-text-input
                     style="border-radius: 57px"
@@ -63,7 +63,7 @@
             <br>
 
             <div class="flex flex-col mb-4 w-[745px] mx-auto">
-                <!-- Remember Me -->
+
                 <div class="flex items-center mb-4 text-left">
                     <input
                         id="remember_me"
@@ -78,7 +78,7 @@
 
                 <br>
 
-                <!-- Actions -->
+
                 <div class="flex justify-between items-center mt-4">
                     @if (Route::has('password.request'))
                         <a

@@ -30,19 +30,19 @@ class ScreenshotController extends Controller
             return response()->json(['error' => 'Télétravailleur non trouvé.'], 404);
         }
 
-        // Validation du format base64
+
         $request->validate([
             'screenshot' => [
                 'required',
                 'string',
-                'regex:/^data:image\/png;base64,/', // Assouplir la regex pour permettre plus de caractères
+                'regex:/^data:image\/png;base64,/',
                 function ($attribute, $value, $fail) {
-                    // Nettoyer la chaîne avant validation
+
                     $base64String = str_replace('data:image/png;base64,', '', $value);
                     $base64String = str_replace(' ', '+', $base64String);
-                    $base64String = preg_replace('/\s+/', '', $base64String); // Supprimer les retours à la ligne et espaces
+                    $base64String = preg_replace('/\s+/', '', $base64String);
 
-                    // Vérifier la taille approximative
+
                     $sizeInBytes = (strlen($base64String) * 3) / 4 - substr_count($base64String, '=');
                     if ($sizeInBytes > 5 * 1024 * 1024) {
                         $fail('L’image est trop volumineuse (max: 5 Mo).');
@@ -51,7 +51,7 @@ class ScreenshotController extends Controller
                         $fail('L’image est trop petite (min: 100 octets).');
                     }
 
-                    // Vérifier si la chaîne est un base64 valide
+
                     $decoded = base64_decode($base64String, true);
                     if ($decoded === false) {
                         $fail('Format base64 invalide.');
@@ -61,17 +61,17 @@ class ScreenshotController extends Controller
         ]);
 
         try {
-            // Extraction et décodage de l'image base64
+
             $imageData = str_replace('data:image/png;base64,', '', $request->input('screenshot'));
             $imageData = str_replace(' ', '+', $imageData);
-            $imageData = preg_replace('/\s+/', '', $imageData); // Supprimer les retours à la ligne et espaces
+            $imageData = preg_replace('/\s+/', '', $imageData);
             $image = base64_decode($imageData, true);
 
             if ($image === false) {
                 Log::error('Échec du décodage de l’image base64.', [
                     'teletravailleur_id' => $teletravailleur->id,
                     'base64_length' => strlen($imageData),
-                    'base64_sample' => substr($imageData, 0, 100), // Ajouter un échantillon pour débogage
+                    'base64_sample' => substr($imageData, 0, 100),
                 ]);
                 return response()->json(['error' => 'Format de l’image invalide.'], 422);
             }
@@ -86,15 +86,7 @@ class ScreenshotController extends Controller
                 return response()->json(['error' => 'Taille de l’image invalide.'], 422);
             }
 
-            // Supprimer la vérification stricte du type PNG pour l'instant
-            // $imageResource = imagecreatefromstring($image);
-            // if ($imageResource === false) {
-            //     Log::error('L’image n’est pas une image PNG valide.', [
-            //         'teletravailleur_id' => $teletravailleur->id,
-            //     ]);
-            //     return response()->json(['error' => 'L’image n’est pas une image PNG valide.'], 422);
-            // }
-            // imagedestroy($imageResource);
+
 
             $filename = 'screenshots/' . $teletravailleur->id . '_' . now()->format('Ymd_His') . '.png';
 
@@ -146,23 +138,23 @@ class ScreenshotController extends Controller
     {
         Log::info('Début de la capture d’écran via Node.js', ['user_id' => Auth::id()]);
 
-        // Chemin vers le script Node.js
+
         $command = escapeshellcmd('node ' . base_path('node-scripts/test.js'));
 
-        // Exécuter la commande et capturer la sortie
+
         $output = [];
         $resultCode = null;
         exec($command . ' 2>&1', $output, $resultCode);
 
-        // Vérifier si la capture a réussi
+
         if ($resultCode === 0) {
-            // Attendre 1 seconde pour s'assurer que l'image est bien écrite
+
             sleep(1);
 
-            // Vérifier que l'image a été créée
+
             $imagePath = public_path('test-capture.png');
             if (file_exists($imagePath)) {
-                // Vérifier la taille de l'image
+
                 $imageSize = filesize($imagePath);
                 Log::info('Taille de test-capture.png après exécution de test.js', ['size' => $imageSize]);
                 if ($imageSize < 100) {
@@ -176,7 +168,7 @@ class ScreenshotController extends Controller
                     ], 500);
                 }
 
-                // Lire l'image et la convertir en base64
+
                 $imageData = file_get_contents($imagePath);
                 if ($imageData === false) {
                     Log::error('Échec de la lecture de l’image capturée.', [
@@ -190,7 +182,7 @@ class ScreenshotController extends Controller
                 $base64Image = 'data:image/png;base64,' . base64_encode($imageData);
                 Log::info('Image convertie en base64 avec succès', ['base64_length' => strlen($base64Image)]);
 
-                // Simuler une requête pour la méthode store
+
                 $request->merge(['screenshot' => $base64Image]);
                 return $this->store($request);
             } else {

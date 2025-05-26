@@ -11,7 +11,7 @@
 
 
 
-            <!-- Champ Email -->
+
             <div class="w-[745px]" style="border-radius: 77px; ">
 
                 <input   type="email" name="email" id="email" value="{{ request()->email }}" required
@@ -20,7 +20,7 @@
                 <x-input-error :messages="$errors->get('email')" class="mt-1 text-red-200 font-poppins text-sm" />
             </div>
 
-            <!-- Champ Nouveau mot de passe -->
+
             <div class="w-[745px]">
 
                 <input type="password" name="password" id="password" required
@@ -29,7 +29,7 @@
                 <x-input-error :messages="$errors->get('password')" class="mt-1 text-red-200 font-poppins text-sm" />
             </div>
 
-            <!-- Champ Confirmer mot de passe -->
+
             <div class="w-[745px]">
 
                 <input type="password" name="password_confirmation" id="password_confirmation" required
@@ -40,7 +40,7 @@
 
             <br>
 
-            <!-- Bouton Réinitialiser -->
+
             <button type="submit"
                     class="h-[78px] w-[245px] rounded-[57px] bg-[#D9D9D9] opacity-100 text-black font-black text-[24px] font-inter hover:bg-[#319FBB] transition duration-200">
                 Reset password

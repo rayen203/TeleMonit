@@ -29,7 +29,7 @@
         <form method="POST" action="{{ route('password.update') }}">
             @csrf
 
-            <!-- Old Password -->
+
             <div class="mb-4 text-center">
                 <x-text-input
                     style="border-radius: 57px;"
@@ -44,7 +44,7 @@
                 <x-input-error :messages="$errors->get('password')" class="mt-1 text-red-200 font-poppins text-sm" />
             </div>
             <br>
-            <!-- New Password -->
+
             <div class="mb-4 text-center">
                 <x-text-input
                     style="border-radius: 57px;"
@@ -59,7 +59,7 @@
                 <x-input-error :messages="$errors->get('new_password')" class="mt-1 text-red-200 font-poppins text-sm" />
             </div>
             <br>
-            <!-- Confirm Password -->
+
             <div class="mb-4 text-center">
                 <x-text-input
                     style="border-radius: 57px;"
@@ -75,16 +75,16 @@
             </div>
 
             <br>
-            <!-- Boutons Back et Confirm -->
+
             <div class="flex justify-center mt-4 space-x-4">
-                <!-- Bouton Back -->
+
                 <a
                     href="{{ auth()->user()->teletravailleur ? route('teletravailleur.dashboard') : route('admin.dashboard') }}"
                     class="h-[78px] w-[245px] rounded-[57px] bg-[#D9D9D9] opacity-100 text-black font-black text-[24px] font-inter hover:bg-[#319FBB] transition duration-200 flex items-center justify-center"
                 >
                     Back
                 </a>
-                <!-- Bouton Confirm -->
+
                 <button
                     type="submit"
                     class="h-[78px] w-[245px] rounded-[57px] bg-[#D9D9D9] opacity-100 text-black font-black text-[24px] font-inter hover:bg-[#319FBB] transition duration-200"

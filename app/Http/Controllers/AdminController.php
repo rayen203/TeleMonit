@@ -70,7 +70,7 @@ class AdminController extends Controller
 
         $password = Str::random(10);
 
-        // Valider explicitement le mot de passe généré (pour plus de sécurité)
+
         $passwordValidator = \Validator::make(['password' => $password], [
             'password' => 'required|string|min:8',
         ]);
@@ -80,7 +80,7 @@ class AdminController extends Controller
             return redirect()->route('admin.dashboard')->with('error', 'Erreur lors de la création du mot de passe.');
         }
 
-        // Crée un utilisateur
+
         try {
             $user = Utilisateur::create([
                 'nom' => $request->nom,
@@ -92,7 +92,7 @@ class AdminController extends Controller
 
             \Log::info('Utilisateur créé avec succès : ID ' . $user->id . ', Email : ' . $user->email);
 
-            // Créer un télétravailleur avec un token unique
+
             $token = Str::random(60);
             $teletravailleur = Teletravailleur::create([
                 'user_id' => $user->id,
@@ -107,7 +107,7 @@ class AdminController extends Controller
 
             \Log::info('Télétravailleur créé avec succès : ID ' . $teletravailleur->id . ', Token : ' . $token);
 
-            // Envoyer un email de bienvenue avec le mot de passe et le lien de complétion
+
             $completionLink = route('teletravailleur.complete', ['token' => $token]);
             \Log::info('Lien de complétion généré : ' . $completionLink);
 
@@ -126,19 +126,19 @@ class AdminController extends Controller
         $teletravailleur = Teletravailleur::findOrFail($id);
 
         try {
-            // Supprimer la photo de profil si elle existe
+
             if ($teletravailleur->photoProfil) {
                 Storage::disk('public')->delete($teletravailleur->photoProfil);
             }
 
-            // Vérifier et supprimer l'utilisateur lié
+
             if ($teletravailleur->utilisateur) {
                 $utilisateur = $teletravailleur->utilisateur;
                 Log::info('Télétravailleur et utilisateur supprimés : ' . $utilisateur->nom . ' ' . $utilisateur->prenom);
                 $utilisateur->delete();
             }
 
-            // Supprimer le télétravailleur
+
             $teletravailleur->delete();
 
             return redirect()->route('admin.teletravailleurs.index')->with('success', 'Télétravailleur et utilisateur supprimés avec succès.');

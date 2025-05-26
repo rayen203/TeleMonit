@@ -20,7 +20,7 @@
     <form method="POST" action="{{ route('admin.teletravailleur.store') }}" class="flex flex-col items-center space-y-6">
         @csrf
 
-        <!-- Champ Nom -->
+
         <div class="w-[745px]">
 
             <input type="text" id="nom" name="nom" value="{{ old('nom') }}" required
@@ -31,7 +31,7 @@
             @enderror
         </div>
 
-        <!-- Champ Prénom -->
+
         <div class="w-[745px]">
 
             <input type="text" id="prenom" name="prenom" value="{{ old('prenom') }}" required
@@ -42,7 +42,7 @@
             @enderror
         </div>
 
-        <!-- Champ Email -->
+
         <div class="w-[745px]">
 
             <input type="email" id="email" name="email" value="{{ old('email') }}" required
@@ -55,9 +55,9 @@
 
         <br><br>
 
-        <!-- Boutons -->
+
         <div class="flex justify-center mt-4 space-x-4">
-            <!-- Bouton Back to Admin Dashboard -->
+
             <a
                 href="{{ route('admin.dashboard') }}"
                 class="h-[78px] w-[245px] rounded-[57px] bg-[#D9D9D9] opacity-100 text-black font-black text-[24px] font-inter hover:bg-[#319FBB] transition duration-200 flex items-center justify-center"
@@ -65,7 +65,7 @@
                 Back
             </a>
 
-            <!-- Bouton Créer -->
+
             <button
                 type="submit"
                 class="h-[78px] w-[245px] rounded-[57px] bg-[#D9D9D9] opacity-100 text-black font-black text-[24px] font-inter hover:bg-[#319FBB] transition duration-200"

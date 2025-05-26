@@ -41,10 +41,10 @@ class ProfileController extends Controller
     $user = $request->user();
 
     try {
-        // Log des données reçues
+
         Log::info('Données reçues pour mise à jour', $request->all());
 
-        // Validation des champs
+
         $rules = [
             'nom' => 'required|string|max:255',
             'prenom' => 'required|string|max:255',
@@ -63,7 +63,7 @@ class ProfileController extends Controller
         $validatedData = $request->validate($rules);
         Log::info('Données validées avec succès', $validatedData);
 
-        // Mise à jour des champs communs dans utilisateurs
+
         $user->nom = $validatedData['nom'];
         $user->prenom = $validatedData['prenom'];
         $user->email = $validatedData['email'];
@@ -72,14 +72,14 @@ class ProfileController extends Controller
             $user->email_verified_at = null;
         }
 
-        // Mise à jour des champs spécifiques au télétravailleur
+
         if ($user->teletravailleur) {
             $teletravailleur = $user->teletravailleur;
             $teletravailleur->CIN = $validatedData['cin'];
             $teletravailleur->telephone = $validatedData['telephone'];
             $teletravailleur->adresse = $validatedData['adresse'];
 
-            // Gestion de la photo de profil dans teletravailleur
+
             if ($request->hasFile('photoProfil')) {
                 if ($teletravailleur->photoProfil) {
                     Storage::disk('public')->delete($teletravailleur->photoProfil);
@@ -96,11 +96,11 @@ class ProfileController extends Controller
             Log::info('Télétravailleur mis à jour', ['teletravailleur' => $teletravailleur->fresh()->toArray()]);
         }
 
-        // Sauvegarder les modifications de l'utilisateur
+
         $user->save();
         Log::info('Utilisateur mis à jour avec succès', ['user' => $user->fresh()->toArray()]);
 
-        // Redirection conditionnelle
+
         if ($user->teletravailleur) {
             Log::info('Redirection vers le tableau de bord télétravailleur');
             return Redirect::route('teletravailleur.dashboard')->with('status', 'Profil mis à jour avec succès.');

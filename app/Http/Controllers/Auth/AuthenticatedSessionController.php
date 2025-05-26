@@ -42,6 +42,6 @@ class AuthenticatedSessionController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
         Log::info('Utilisateur déconnecté');
-        return redirect(RouteServiceProvider::HOME); // Redirige directement vers /login
+        return redirect(RouteServiceProvider::HOME);
     }
 }

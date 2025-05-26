@@ -19,7 +19,7 @@
         <form method="POST" action="{{ route('teletravailleur.complete.store', $token) }}">
             @csrf
 
-            <!-- CIN -->
+
             <div class="mb-4 text-center">
                 <x-text-input
                     style="border-radius: 57px;"
@@ -36,7 +36,7 @@
                 @enderror
             </div>
 
-            <!-- Phone number -->
+
             <div class="mb-4 text-center">
                 <x-text-input
                     style="border-radius: 57px;"
@@ -53,7 +53,7 @@
                 @enderror
             </div>
 
-            <!-- Address -->
+
             <div class="mb-4 text-center">
                 <x-text-input
                     style="border-radius: 57px;"
@@ -71,7 +71,7 @@
             </div>
 
             <br>
-            <!-- Bouton Next -->
+
             <div class="flex justify-center mt-4">
                 <button
                     type="submit"
@@ -82,7 +82,7 @@
             </div>
         </form>
         <br><br><br><br><br>
-        <!-- 3 points sous la carte -->
+
         <div class="flex justify-center mt-6 space-x-2">
             <div class="w-4 h-4 bg-[#D9D9D9] rounded-full opacity-50"></div>
             <div class="w-4 h-4 bg-[#D9D9D9] rounded-full "></div>

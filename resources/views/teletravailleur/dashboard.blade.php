@@ -1,9 +1,9 @@
 @extends('layouts.base-interface')
 
 @section('content')
-<!-- Conteneur principal pour gérer le positionnement -->
+
 <div style="position: relative; width: 100%; min-height: 100vh; overflow: visible;  padding: -10px; ">
-    <!-- Section admin ancrée à gauche -->
+
     <div style="position: absolute; left: -210px; top: 60px; z-index: 10;">
         <div class="p-3" style="background: rgba(0, 0, 0, 0.5); border-radius: 77px; width: 574px; height: 220px; position: relative; border: 0.5px solid rgb(113, 113, 113); backdrop-filter: blur(10px);">
             <div class="d-flex align-items-center mb-2">
@@ -23,7 +23,7 @@
         </div>
     </div>
 
-    <!-- Boutons -->
+
     <div id="button-container" style="position: absolute; left: 10px; top: 300px; z-index: 10; display: flex; flex-direction: column; gap: 10px;" class="button-container">
         <a href="{{ route('teletravailleur.dashboard') }}" class="btn btn-primary rounded-pill px-4 py-2" style="display: flex; align-items: center; justify-content: center; backdrop-filter: blur(10px);">
             <img src="{{ asset('images/chrono.png') }}" alt="Chrono Icon" style="width: 55px; height: 53px; margin-right: 10px; margin-left: 110px;">
@@ -42,7 +42,7 @@
 
 
 
-    <!-- Conteneur pour le timer et les détails -->
+
     <div style="margin-left: 360px; min-height: calc(100vh - 40px); padding: 20px 0 20px 20px; max-width: none; width: calc(100% - 300px);">
         <div class="container-fluid" style="color: white; padding-right: 0; margin-right: 0;">
             @if (session('status'))
@@ -59,7 +59,7 @@
             </div>
 
             <br>
-            <!-- Timer Section -->
+
             <div style="text-align: center; margin-bottom: 20px;  ">
                 <div style="width: 675px; height: 80px; font-size: 60px; font-weight: bold; color: #FFFFFF; margin: 10px auto; background: rgba(0, 0, 0, 0.5); border-radius: 77px; border: 1px solid #444; display: flex; align-items: center; justify-content: center; padding: 0 15px; backdrop-filter: blur(10px); font-family: 'Jersey 25', sans-serif; ">
                     <span id="timerDisplay">00:00:00</span>
@@ -86,11 +86,11 @@
 
             <br>
 
-            <!-- Carte pour les sections -->
+
             <div class="card" style="background: rgba(0, 0, 0, 0.5); border-radius: 77px; padding: 15px; border: 1px solid #444; width: 1060px; height: 350px; overflow-y: auto; position: relative; padding-right: 10px; backdrop-filter: blur(10px); scrollbar-width: none; -ms-overflow-style: none; margin-top: 20px;">
                 <br>
 
-                <!-- Section Suivi des Heures -->
+
                 <div class="section-content">
 
                     <a href="{{ route('teletravailleur.chat.index') }}" class="btn btn-primary rounded-pill px-4 py-2" style="display: flex; align-items: center; justify-content: end;  margin-bottom: -45px; margin-right: 20px;font-size: 20px; font-weight: bold;">
@@ -101,7 +101,7 @@
                     <h4 style="font-weight: bold; font-size: 25px; margin-left: 20px;">Hours Tracked</h4>
 
                     @php
-    // Calculer le total du jour
+
     $todaySeconds = 0;
     $todaySessions = \App\Models\WorkingHour::where('teletravailleur_id', $teletravailleur->id)
         ->where('date', now()->toDateString())
@@ -117,7 +117,7 @@
     $seconds = $remainingSeconds % 60;
     $todayFormattedCorrected = "{$hours}h {$minutes}m {$seconds}s";
 
-    // Calculer le total mensuel
+
     $selectedMonth = request()->input('month', now()->format('Y-m'));
     $startOfMonth = \Carbon\Carbon::createFromFormat('Y-m', $selectedMonth)->startOfMonth();
     $endOfMonth = \Carbon\Carbon::createFromFormat('Y-m', $selectedMonth)->endOfMonth();
@@ -142,10 +142,10 @@
 
                 </div>
 
-                <!-- Ligne de séparation -->
+
                 <hr class="section-divider">
 
-                <!-- Section Historique des Captures d'Écran -->
+
                 <div class="section-content">
                     <h4 style="font-weight: bold; font-size: 25px; margin-left: 20px;">Screenshots History</h4>
                     <br>
@@ -179,10 +179,10 @@
                     @endif
                 </div>
 
-                <!-- Ligne de séparation -->
+
                 <hr class="section-divider">
 
-                <!-- Section Historique des Heures -->
+
                 <div class="section-content">
                     <h4 style="font-weight: bold; font-size: 25px; margin-left: 20px;">Hours History</h4>
                     <br>
@@ -225,10 +225,10 @@
                     @endif
                 </div>
 
-                <!-- Ligne de séparation -->
+
                 <hr class="section-divider">
 
-                <!-- Section Statistiques Mensuelles -->
+
                 <div class="section-content">
                     <h4 style="font-weight: bold; font-size: 25px; margin-left: 20px;">Monthly Statistics</h4>
                     <br>
@@ -249,7 +249,7 @@
                         $startOfMonth = $selectedDate->copy()->startOfDay();
                         $endOfMonth = $selectedDate->copy()->endOfMonth()->endOfDay();
 
-                        // Utiliser la valeur calculée dans "Hours Tracked" au lieu de recalculer
+
                         $monthlySeconds = $monthlySeconds ?? 0;
                         $totalHours = round($monthlySeconds / 3600, 2);
 
@@ -314,10 +314,9 @@
         return `${h}h ${m}m ${s}s`;
     }
 
-    // Supprimer l'utilisation de todayHoursElement et monthlyHoursElement car on utilise $todayFormatted et $monthlyFormatted
-    // Ces éléments ne sont plus nécessaires ici, car le formatage est déjà fait dans le contrôleur
 
-    // Timer JavaScript
+
+
     let timerInterval;
     let screenshotInterval = null;
     let totalSeconds = 0;
@@ -543,7 +542,7 @@
     document.getElementById('stopBtn').addEventListener('click', async () => {
     try {
         console.log('Arrêt de la session à :', new Date());
-        const effectiveSeconds = totalSeconds - Math.floor(pausedTime / 1000); // Convertir pausedTime en secondes
+        const effectiveSeconds = totalSeconds - Math.floor(pausedTime / 1000);
         const response = await fetch('{{ route("teletravailleur.working-hours.stop") }}', {
             method: 'POST',
             headers: {
@@ -551,7 +550,7 @@
                 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
             },
             credentials: 'include',
-            body: JSON.stringify({ total_seconds: effectiveSeconds }) // Envoyer uniquement le temps effectif
+            body: JSON.stringify({ total_seconds: effectiveSeconds })
         });
 
         const data = await response.json();
@@ -614,7 +613,7 @@
     }
     keepPageActive();
 
-    // Chart JS
+
     function loadChart() {
         if (typeof Chart === 'undefined') {
             const chartScript = document.createElement('script');
