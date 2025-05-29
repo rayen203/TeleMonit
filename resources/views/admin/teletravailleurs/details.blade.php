@@ -8,7 +8,7 @@
         <div class="p-3" style="background: rgba(0, 0, 0, 0.5); border-radius: 77px; width: 574px; height: 220px; position: relative; border: 0.5px solid rgb(113, 113, 113); backdrop-filter: blur(10px);">
             <div class="d-flex align-items-center mb-2">
                 <div style="position: relative;">
-                    <img src="{{ Auth::user()->photoProfil ? asset('storage/' . Auth::user()->photoProfil) : asset('images/avatar1.png') }}" alt="Admin Photo" class="rounded-circle me-3" style="width: 127px; height: 122px; margin-left: 190px;" onerror="this.src='{{ asset('images/avatar1.png') }}';">
+                   <img src="{{ Auth::user()->photoProfil ? asset('storage/' . Auth::user()->photoProfil) : asset('images/avatar1.png') }}" alt="Admin Photo" class="rounded-circle me-3" style="width: 127px; height: 122px; margin-left: 190px;" onerror="this.src='{{ asset('images/avatar1.png') }}';">
                     <a href="{{ route('profile.edit') }}" style="position: absolute; margin-top: -120px; margin-left: 290px;">
                         <img src="{{ asset('images/edit.png') }}" alt="Edit Icon" style="width: 29px; height: 29px;">
                     </a>
@@ -61,7 +61,7 @@
                 <div class="section-content">
                     <div class="d-flex justify-content-between align-items-center">
                         <div class="d-flex align-items-center position-relative">
-                            <img src="{{ $teletravailleur->teletravailleur->photoProfil ? asset('storage/' . $teletravailleur->teletravailleur->photoProfil) : asset('images/default-profile.png') }}" alt="Teleworker Photo" class="rounded-circle me-3" style="width: 90px; height: 90px; margin-top: 20px;border-radius: 77px; margin-left: 20px;" onerror="this.src='{{ asset('images/default-profile.png') }}';">
+                            <img src="{{ $teletravailleur->teletravailleur->photoProfil ? (Str::startsWith($teletravailleur->teletravailleur->photoProfil, 'images/') ? asset($teletravailleur->teletravailleur->photoProfil) : asset('storage/' . $teletravailleur->teletravailleur->photoProfil)) : asset('images/default-profile.png') }}" alt="Teleworker Photo" class="rounded-circle me-3" style="width: 90px; height: 90px; margin-top: 20px;border-radius: 77px; margin-left: 20px;" onerror="this.src='{{ asset('images/default-profile.png') }}';">
                             <div>
                                 <h5 class="mb-1" style="color: #E1E4E6; font-weight: bold; font-size: 23px; margin-left: 150px; margin-top: -95px;">{{ $teletravailleur->nom ?? 'N/A' }} {{ $teletravailleur->prenom ?? '' }}</h5>
                                 <p class="mb-1" style="color: #FFFFFF; font-size: 15px; font-weight: bold; margin-left: 150px; margin-top: 15px; text-decoration: underline; ">{{ $teletravailleur->email ?? 'email@example.com' }}</p>
